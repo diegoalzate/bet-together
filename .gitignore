@@ -61,3 +61,6 @@ yarn-error.log\*
 # vercel
 
 .vercel
+
+.yarn
+bin
