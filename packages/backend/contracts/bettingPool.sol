@@ -47,6 +47,7 @@ contract BettingPool { // use ownable?
   function lockPool () public onlyIfOpen() onlyOwner() {
     openForBets = false;
     // deposit on the yield source
+    yieldSrc.deposit(token.balanceOf(address(this)));
   }
 
   function bet (uint256 option, uint256 amount) external onlyIfOpen() {
@@ -58,8 +59,6 @@ contract BettingPool { // use ownable?
     optionTotalBets[option] += amount;
 
     // interactions
-    // TODO is this correct? should I transfer for this contract before transfering to the yield source?
-      // yes, we only deposit it after the lock
     // TODO: any additional security check?
     token.transferFrom(msg.sender, address(this), amount);
   }
@@ -91,6 +90,7 @@ contract BettingPool { // use ownable?
   }
 
   function getUserBalance (address user) public view returns(uint256) {
+    // TODO: retorn zero after the withdraw?
     return getUserPrincipal(user) + getUserProfit(user);
   }
 
@@ -99,7 +99,8 @@ contract BettingPool { // use ownable?
       return 0;
     }
     uint256 result = getResult();
-    return ( bets[user][result] / optionTotalBets[result] ) * getTotalYield();
+    // TODO: check phantom overflow (https://github.com/Uniswap/v3-core/blob/main/contracts/libraries/FullMath.sol)
+    return ( bets[user][result] * getTotalYield() ) / optionTotalBets[result];
   }
 
   function getUserPrincipal (address user) public view returns(uint256) {
