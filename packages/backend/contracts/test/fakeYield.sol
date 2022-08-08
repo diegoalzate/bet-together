@@ -3,6 +3,7 @@ pragma solidity ^0.8.4;
 
 import {IYieldSource} from "../IYieldSource.sol";
 import {MyToken} from "./token.sol";
+import "hardhat/console.sol";
 
 contract fakeYieldSource is IYieldSource {
   MyToken token;
@@ -18,7 +19,7 @@ contract fakeYieldSource is IYieldSource {
     amountDeposited += amount;
     token.transferFrom(msg.sender, address(this), amount);
     // generate fake 10% yield
-    token.mint(address(this), (110 * amount) / 100);
+    token.mint(address(this), (110 * amount) / 100 - amount);
   }
 
   function getBalance () external view override returns (uint256) {
