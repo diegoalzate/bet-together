@@ -86,8 +86,7 @@ const Team = () => {
       message: "Just vibin",
     },
     {
-      name: "Epitaxial Layer",
-      socialName: "@Epitaxial Layer#3862",
+      name: "Epi",
       message: "Just vibin",
     },
   ];
