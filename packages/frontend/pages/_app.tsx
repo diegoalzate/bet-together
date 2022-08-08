@@ -13,9 +13,11 @@ import {
   getDefaultWallets,
   RainbowKitProvider,
   Chain,
+  darkTheme,
 } from '@rainbow-me/rainbowkit';
 
-import { useIsMounted } from '../hooks';
+import { useIsMounted } from '@/hooks';
+import { WebLayout } from '@/components';
 
 // Get environment variables
 const alchemyId = process.env.NEXT_PUBLIC_ALCHEMY_ID as string;
@@ -37,7 +39,7 @@ const hardhatChain: Chain = {
 };
 
 const { chains, provider } = configureChains(
-  [chain.mainnet, chain.polygon, chain.optimism, chain.arbitrum, hardhatChain],
+  [ chain.polygonMumbai, hardhatChain],
   [alchemyProvider({ alchemyId }), publicProvider()]
 );
 
@@ -58,11 +60,13 @@ const App = ({ Component, pageProps }: AppProps) => {
   if (!isMounted) return null;
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider coolMode chains={chains}>
+      <RainbowKitProvider coolMode chains={chains} theme={darkTheme()}>
         <NextHead>
-          <title>create-web3</title>
+          <title>Bet together</title>
         </NextHead>
-        <Component {...pageProps} />
+        <WebLayout>
+          <Component {...pageProps} />
+        </WebLayout>
       </RainbowKitProvider>
     </WagmiConfig>
   );
