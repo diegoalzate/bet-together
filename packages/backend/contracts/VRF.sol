@@ -4,7 +4,7 @@
 // import abi from './utils/VRF2.json'
 // const contractAddressVRF = 0x2cb1ebc4e9f90e8ec693e42560540b28a0f71aaa  //(On Mumbai)
 // const abiVRF = abi.abi
-// provider = new ethers.providers.Web3Provider(window.ethereum)
+// const provider = new ethers.providers.Web3Provider(window.ethereum)
 // const signer = provider.getSigner()
 // const contractVRF = new ethers.Contract( contractAddressVRF, abiVRF, signer)
 
@@ -13,8 +13,8 @@
 //
 // // Step 2: RETREIVE RANDOM NUMBER between min and max: min + rand % (max - min + 1) 
 // // let min = 0 and max = 1 therefore modulus = (1 - 0 + 1) = 2
-// let random = await contract.s_randomWords( 0 ) % 2 // where: s_randomWords is an array with elements 0 and 1
-// let otherRandom = await contract.s_randomWords( 1 ) % 2
+// let randomOne = await contract.s_randomWords( 0 ) % 2 // where: s_randomWords is an array with elements 0 and 1
+// let randomTwo = await contract.s_randomWords( 1 ) % 2
 
 pragma solidity ^0.8.7;
 
