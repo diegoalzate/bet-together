@@ -14,10 +14,11 @@ contract BettingPoolFactory { // TODO: use ownable?
     address indexed resultController
   );
 
-  function createPool (address token, address resultController, address yieldSrc) external {
+  function createPool (address token, address resultController, address yieldSrc) external returns(uint256) {
     BettingPool pool = new BettingPool(msg.sender, token, resultController, yieldSrc);
     pools.push(pool);
-    emit PoolCreated(msg.sender, address(0), address(0));
+    emit PoolCreated(msg.sender, address(token), address(resultController));
+    return pools.length - 1;
   }
 
   function poolCount () public view returns(uint256) {
