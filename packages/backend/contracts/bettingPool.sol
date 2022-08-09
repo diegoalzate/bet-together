@@ -48,6 +48,7 @@ contract BettingPool { // use ownable?
     openForBets = false;
     // deposit on the yield source
     yieldSrc.deposit(token.balanceOf(address(this)));
+    // TODO: add event
   }
 
   function bet (uint256 option, uint256 amount) external onlyIfOpen() {
@@ -61,6 +62,7 @@ contract BettingPool { // use ownable?
     // interactions
     // TODO: any additional security check?
     token.transferFrom(msg.sender, address(this), amount);
+    // TODO: add event
   }
 
   function hasResult () public view returns(bool) {
@@ -87,6 +89,7 @@ contract BettingPool { // use ownable?
     withdrawals[msg.sender] = true;
     // interactions
     yieldSrc.withdraw(msg.sender, getUserBalance(msg.sender));
+    // TODO: add event
   }
 
   function getUserBalance (address user) public view returns(uint256) {
