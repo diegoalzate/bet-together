@@ -7,7 +7,8 @@ describe("BettingPool", function () {
   let poolFactoryContract: any;
   let tokenContractFactory: any;
   let tokenContract: any;
-  let coinFlipContract: any;
+  let fakeCoinFlipContract: any;
+  let notQuiteRandomCoinFlipContract: any;
   let yieldContract: any;
   let accounts: SignerWithAddress[];
 
@@ -33,8 +34,8 @@ describe("BettingPool", function () {
     await expect(allowance).to.equal(amount);
   }
 
-  const placeBet = async (account: SignerWithAddress, option:number, amount:number) => {
-    const poolContract = await getPoolContract(0);
+  const placeBet = async (pool: number, account: SignerWithAddress, option:number, amount:number) => {
+    const poolContract = await getPoolContract(pool);
     await approve(account, poolContract.address, amount);
     const connectedPoolContract = poolContract.connect(account);
     const tx = await connectedPoolContract.bet(option, amount);
@@ -43,8 +44,8 @@ describe("BettingPool", function () {
     expect(principal).to.equal(amount);
   }
 
-  const lockPool = async () => {
-    const poolContract = await getPoolContract(0);
+  const lockPool = async (pool: number) => {
+    const poolContract = await getPoolContract(pool);
     const tx = await poolContract.lockPool();
     await tx.wait();
     await expect(
@@ -53,21 +54,33 @@ describe("BettingPool", function () {
     
   }
 
-  const generateResult = async (option: number) => {
-    const beforeHasResult = await coinFlipContract.hasResult();
+  const generateFakeResult = async (option: number) => {
+    const contract = fakeCoinFlipContract;
+    const beforeHasResult = await contract.hasResult();
     expect(beforeHasResult).to.equal(false);
-    const tx = await coinFlipContract.setResult(option);
+    const tx = await contract.setResult(option);
     await tx.wait();
-    const afterHasResult = await coinFlipContract.hasResult();
+    const afterHasResult = await contract.hasResult();
     expect(afterHasResult).to.equal(true);
-    const result = await coinFlipContract.getResult();
+    const result = await contract.getResult();
     expect(result).to.equal(option);
   }
 
-  const withdraw = async (account: SignerWithAddress) => {
+  const generateNotQuiteRandomResult = async () => {
+    const contract = notQuiteRandomCoinFlipContract;
+    const beforeHasResult = await contract.hasResult();
+    expect(beforeHasResult).to.equal(false);
+    const tx = await contract.generateResult();
+    await tx.wait();
+    const afterHasResult = await contract.hasResult();
+    expect(afterHasResult).to.equal(true);
+    const result = await contract.getResult();
+  }
+
+  const withdraw = async (pool: number, account: SignerWithAddress) => {
     const connectedToken = await tokenContract.connect(account);
     const beforeTokenBalance = await connectedToken.balanceOf(account.address);
-    const poolContract = await getPoolContract(0);
+    const poolContract = await getPoolContract(pool);
     const connectedPoolContract = poolContract.connect(account);
     const poolBalance = await connectedPoolContract.getUserBalance(account.address);
     const tx = await connectedPoolContract.withdraw();
@@ -76,37 +89,72 @@ describe("BettingPool", function () {
     await expect(afterTokenBalance).to.equal(beforeTokenBalance + poolBalance);
   }
 
-  beforeEach(async () => {
-    accounts = await ethers.getSigners();
-    // deploy factory
+  const deployPoolFactory = async () => {
     poolFactoryFactory = await ethers.getContractFactory("BettingPoolFactory");
     poolFactoryContract = await poolFactoryFactory.deploy();
     await poolFactoryContract.deployed();
+  }
+
+  const deployToken = async () => {
+    tokenContractFactory = await ethers.getContractFactory("MyToken");
+    tokenContract = await tokenContractFactory.deploy();
+    await tokenContract.deployed();
+  }
+
+  const deployFakeCoinFlip = async () => {
+    const coinFlipFactory = await ethers.getContractFactory("fakeCoinFlip")
+    fakeCoinFlipContract =  await coinFlipFactory.deploy();
+    await fakeCoinFlipContract.deployed();
+  }
+
+  const deployYieldContract = async () => {
+    const yieldFactory = await ethers.getContractFactory("fakeYieldSource")
+    yieldContract =  await yieldFactory.deploy(tokenContract.address);
+    await yieldContract.deployed();
+  }
+
+  const deployNotQuiteRandom = async () => {
+    const notQuiteRandomFactoryFactory = await ethers.getContractFactory("notQuiteRandomFactory");
+    const notQuiteRandomFactoryContract = await notQuiteRandomFactoryFactory.deploy();
+    await notQuiteRandomFactoryContract.deployed();
+    const tx = await notQuiteRandomFactoryContract.createCoinFlip();
+    await tx.wait();
+   
+    const coinFlipFactory = await ethers.getContractFactory("notQuiteRandomCoinFlip");
+    let coinFlipAddress = await notQuiteRandomFactoryContract.coinFlipControllers(0);
+    notQuiteRandomCoinFlipContract = coinFlipFactory.attach(coinFlipAddress);
+  }
+
+  beforeEach(async () => {
+    accounts = await ethers.getSigners();
+    // deploy factory
+    await deployPoolFactory();
     // check 0 pools
     const poolCount = await poolFactoryContract.poolCount(); 
     expect(poolCount).to.equal(0);
     // deploy token
-    tokenContractFactory = await ethers.getContractFactory("MyToken");
-    tokenContract = await tokenContractFactory.deploy();
-    await tokenContract.deployed();
+    await deployToken();
     // deploy fake coinflip
-    const coinFlipFactory = await ethers.getContractFactory("fakeCoinFlip")
-    coinFlipContract =  await coinFlipFactory.deploy();
-    await coinFlipContract.deployed();
-    // deploy fake coinflip
-    const yieldFactory = await ethers.getContractFactory("fakeYieldSource")
-    yieldContract =  await yieldFactory.deploy(tokenContract.address);
-    await yieldContract.deployed();
-    // crete first pool
-    const tx = await poolFactoryContract.createPool(tokenContract.address,
-                                                    coinFlipContract.address,
+    await deployFakeCoinFlip();
+    // deploy fake yieldsource
+    await deployYieldContract();
+    // deploy notQuiteRandomCoinflip
+    await deployNotQuiteRandom();
+    // create first pool (fake)
+    let tx = await poolFactoryContract.createPool(tokenContract.address,
+                                                    fakeCoinFlipContract.address,
                                                     yieldContract.address);
+    await tx.wait();
+    // create second pool (notQuiteRandom)
+    tx = await poolFactoryContract.createPool(tokenContract.address,
+                                              notQuiteRandomCoinFlipContract.address,
+                                              yieldContract.address);
     await tx.wait();
   });
 
   it ("Check pool count", async () => {
     const poolCount = await poolFactoryContract.poolCount(); 
-    expect(poolCount).to.equal(1);
+    expect(poolCount).to.equal(2);
   })
 
   it("Check pool", async () => {
@@ -125,8 +173,12 @@ describe("BettingPool", function () {
     await approve(accounts[0], accounts[1].address, amount);
   })
 
-  it("Genrate Results test", async () => {
-    await generateResult(0);
+  it("Genrate Fake Results test", async () => {
+    await generateFakeResult(0);
+  })
+
+  it("Genrate NotQuiteRandom Results test", async () => {
+    await generateNotQuiteRandomResult();
   })
 
   it("Fake yield test", async () => {
@@ -143,7 +195,8 @@ describe("BettingPool", function () {
     expect(afterWithdrawBalance).to.equal(110);
   })
 
-  it("Simple pool test", async () => {
+  it("Simple fake pool test", async () => {
+    const fakePool = 0;
     const initialBalances = [100, 200, 300, 400];
     const len = initialBalances.length;
     const bets = [0, 0, 1, 1];
@@ -158,17 +211,17 @@ describe("BettingPool", function () {
     for (let index=0; index< len; ++index ) {
       const amount = initialBalances[index];
       const option = bets[index];
-      await placeBet(accounts[index], option, amount);
+      await placeBet(fakePool, accounts[index], option, amount);
     }
 
-    await lockPool();
+    await lockPool(fakePool);
 
-    await generateResult(0);
+    await generateFakeResult(0);
 
-    const poolContract = await getPoolContract(0);
+    const poolContract = await getPoolContract(fakePool);
     const result = await poolContract.getResult();
     for (let index=0; index< len; ++index ) {
-      await withdraw(accounts[index]);
+      await withdraw(fakePool, accounts[index]);
       const address = accounts[index].address;
       const balance = await tokenContract.balanceOf(address);
       // check if principal was preserved
@@ -181,4 +234,44 @@ describe("BettingPool", function () {
     }
 
   })
+
+  it("Simple notQuiteRandom pool test", async () => {
+    const notQuiteRandomPool = 1;
+    const initialBalances = [100, 200, 300, 400];
+    const len = initialBalances.length;
+    const bets = [0, 0, 1, 1];
+
+    // mint players tokens
+    for (let index=0; index< len; ++index ) {
+      const amount = initialBalances[index];
+      await mint(accounts[index], amount);
+    }
+    
+    // place bets
+    for (let index=0; index< len; ++index ) {
+      const amount = initialBalances[index];
+      const option = bets[index];
+      await placeBet(notQuiteRandomPool, accounts[index], option, amount);
+    }
+
+    await lockPool(notQuiteRandomPool);
+
+    await generateNotQuiteRandomResult();
+
+    const poolContract = await getPoolContract(notQuiteRandomPool);
+    const result = await poolContract.getResult();
+    for (let index=0; index< len; ++index ) {
+      await withdraw(notQuiteRandomPool, accounts[index]);
+      const address = accounts[index].address;
+      const balance = await tokenContract.balanceOf(address);
+      // check if principal was preserved
+      expect(balance.toNumber()).to.greaterThanOrEqual(initialBalances[index]);
+      const bet = await poolContract.bets(address, result);
+      if (bet.toNumber() > 0) {
+        // if user has a winning bet, his balance should be greater than the initial balance
+        expect(balance.toNumber()).to.greaterThan(initialBalances[index]);
+      }
+    }
+  })
+
 });
