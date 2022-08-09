@@ -125,6 +125,24 @@ describe("BettingPool", function () {
     notQuiteRandomCoinFlipContract = coinFlipFactory.attach(coinFlipAddress);
   }
 
+  const createFakePool  = async () => {
+    let tx = await poolFactoryContract.createPool(tokenContract.address,
+                                                  fakeCoinFlipContract.address,
+                                                  yieldContract.address);
+    await tx.wait();
+  }
+  const createDefaultPool = async () => {
+    const tx = await poolFactoryContract.createDefaultPool(tokenContract.address);
+    await tx.wait();
+    // get pool contract
+    const poolCount = await poolFactoryContract.poolCount(); 
+    const pollContract = await getPoolContract(poolCount - 1);
+    // get coinFlip contract from the pool
+    const coinFlipFactory = await ethers.getContractFactory("notQuiteRandomCoinFlip");
+    const coinFlipAddress = await pollContract.resultController();
+    notQuiteRandomCoinFlipContract = coinFlipFactory.attach(coinFlipAddress);
+  }
+
   beforeEach(async () => {
     accounts = await ethers.getSigners();
     // deploy factory
@@ -138,18 +156,10 @@ describe("BettingPool", function () {
     await deployFakeCoinFlip();
     // deploy fake yieldsource
     await deployYieldContract();
-    // deploy notQuiteRandomCoinflip
-    await deployNotQuiteRandom();
     // create first pool (fake)
-    let tx = await poolFactoryContract.createPool(tokenContract.address,
-                                                    fakeCoinFlipContract.address,
-                                                    yieldContract.address);
-    await tx.wait();
-    // create second pool (notQuiteRandom)
-    tx = await poolFactoryContract.createPool(tokenContract.address,
-                                              notQuiteRandomCoinFlipContract.address,
-                                              yieldContract.address);
-    await tx.wait();
+    await createFakePool()
+    // // create second pool (notQuiteRandom)
+    await createDefaultPool();
   });
 
   it ("Check pool count", async () => {
