@@ -1,5 +1,6 @@
 import heroImage from "@/images/hero.png";
 import Image, { StaticImageData } from "next/image";
+import Link from 'next/link';
 export default function Home() {
   return (
     <div className="flex flex-col space-y-20">
@@ -29,7 +30,10 @@ const Hero = () => {
             Bet together is a crypto betting protocal that allows you to gamble
             on different on chain and off chain events without losing a dime.
           </p>
+          <Link href={'/pool'}>
           <button className="btn bg-pBlue text-white">Get Started</button>
+
+          </Link>
         </div>
       </div>
     </div>

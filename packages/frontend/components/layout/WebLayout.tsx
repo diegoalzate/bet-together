@@ -20,7 +20,9 @@ export const WebLayout = ({ children }: WebLayoutProps) => {
 const Header = () => {
   return (
     <header className="flex justify-between h-28 py-4 px-8 sticky top-0 bg-pDark z-30 text-white font-work-sans">
-      <div className="font-bold text-2xl">Bet together</div>
+      <Link href={"/"}>
+        <div className="font-bold text-2xl cursor-pointer">Bet together</div>
+      </Link>
       <div className="sm:px-6">
         <ConnectButton />
       </div>
