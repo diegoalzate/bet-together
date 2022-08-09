@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-// How to use on Frontend:
+// // How to use on Frontend:
 // import abi from './utils/VRF2.json'
 // const contractAddressVRF = 0x2cb1ebc4e9f90e8ec693e42560540b28a0f71aaa  //(On Mumbai)
 // const abiVRF = abi.abi
