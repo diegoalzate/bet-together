@@ -20,6 +20,7 @@ contract fakeCoinFlip is IResultController {
     require(!_hasResult, "Already has result");
     _hasResult = true;
     result = r;
+    emit resultGenerated (address(this), result);
   }
 
   function hasResult () external view override returns (bool)  {

@@ -8,6 +8,22 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract BettingPool { // use ownable?
 
+  event poolLocked(
+    address indexed poolAddress,
+    uint256 indexed poolBalance
+  );
+
+  event betPlaced(
+    address indexed user,
+    uint256 indexed option,
+    uint256 indexed amount
+  );
+
+  event userWithdraw(
+    address indexed user,
+    uint256 indexed amount
+  );
+
   // Status  public status;
   bool public openForBets;
   address public owner;
@@ -48,7 +64,8 @@ contract BettingPool { // use ownable?
     openForBets = false;
     // deposit on the yield source
     yieldSrc.deposit(token.balanceOf(address(this)));
-    // TODO: add event
+    // emit event
+    emit poolLocked(address(this), token.balanceOf(address(this)));
   }
 
   function bet (uint256 option, uint256 amount) external onlyIfOpen() {
@@ -62,7 +79,8 @@ contract BettingPool { // use ownable?
     // interactions
     // TODO: any additional security check?
     token.transferFrom(msg.sender, address(this), amount);
-    // TODO: add event
+    // emit event
+    emit betPlaced(msg.sender, option, amount);
   }
 
   function hasResult () public view returns(bool) {
@@ -88,12 +106,14 @@ contract BettingPool { // use ownable?
     // effects
     withdrawals[msg.sender] = true;
     // interactions
-    yieldSrc.withdraw(msg.sender, getUserBalance(msg.sender));
-    // TODO: add event
+    uint256 amount = getUserBalance(msg.sender);
+    yieldSrc.withdraw(msg.sender, amount);
+    // emit event
+    emit userWithdraw (msg.sender, amount);
   }
 
   function getUserBalance (address user) public view returns(uint256) {
-    // TODO: retorn zero after the withdraw?
+    // TODO: return zero after the withdraw?
     return getUserPrincipal(user) + getUserProfit(user);
   }
 

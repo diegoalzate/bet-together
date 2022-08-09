@@ -25,6 +25,7 @@ contract notQuiteRandomCoinFlip is IResultController, NotQuiteRandom, Ownable {
     require(!_hasResult, "Already has result");
     _hasResult = true;
     result = getRandomNumberFromInterval(2);
+    emit resultGenerated (address(this), result);
   }
 
   function hasResult () external view override returns (bool)  {
