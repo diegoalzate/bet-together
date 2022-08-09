@@ -9,12 +9,12 @@
 // const contractVRF = new ethers.Contract( contractAddressVRF, abiVRF, signer)
 
 // // Step 1: GENERATE RANDOM NUMBER: 
-//   await contract.requestRandomWords()
+//   await contractVRF.requestRandomWords()
 //
 // // Step 2: RETREIVE RANDOM NUMBER between min and max: min + rand % (max - min + 1) 
 // // let min = 0 and max = 1 therefore modulus = (1 - 0 + 1) = 2
-// let randomOne = await contract.s_randomWords( 0 ) % 2 // where: s_randomWords is an array with elements 0 and 1
-// let randomTwo = await contract.s_randomWords( 1 ) % 2
+// let randomOne = await contractVRF.s_randomWords( 0 ) % 2 // where: s_randomWords is an array with elements 0 and 1
+// let randomTwo = await contractVRF.s_randomWords( 1 ) % 2
 
 pragma solidity ^0.8.7;
 
