@@ -5,8 +5,9 @@ import "hardhat/console.sol";
 import {IResultController} from "./IResultController.sol";
 import {IYieldSource} from "./IYieldSource.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract BettingPool { // use ownable?
+contract BettingPool is Ownable {
 
   event poolLocked(
     address indexed poolAddress,
@@ -26,7 +27,6 @@ contract BettingPool { // use ownable?
 
   // Status  public status;
   bool public openForBets;
-  address public owner;
   IERC20 public token;
   IResultController public resultController;
   IYieldSource public yieldSrc;
@@ -43,21 +43,16 @@ contract BettingPool { // use ownable?
     _;
   }
 
-  modifier onlyOwner() {
-    require(msg.sender == owner, "Not the pool owner.");
-    _;
-  }
-
   constructor (address _owner, 
                address _token,
                address _resultController,
                address _yieldSrc) {
-    owner = _owner;
     token = IERC20(_token);
     resultController = IResultController(_resultController);
     yieldSrc = IYieldSource(_yieldSrc);
     openForBets = true;
     token.approve(_yieldSrc, type(uint256).max);
+    transferOwnership(_owner);
   }
 
   function lockPool () public onlyIfOpen() onlyOwner() {
