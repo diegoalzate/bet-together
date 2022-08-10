@@ -135,4 +135,13 @@ contract BettingPool is Ownable {
     return yieldSrc.getYield(); // TODO: get yield from yieldSource
   }
 
+  function totalAmount () public view returns (uint256) {
+    uint256 count = getOptionsCount();
+    uint256 amount = 0;
+    for (uint i = 0; i<count; ++i) { 
+      amount += optionTotalBets[i];
+    }
+    return amount;
+  }
+
 }
