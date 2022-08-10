@@ -5,10 +5,10 @@ const main: DeployFunction = async function ({getNamedAccounts, deployments}: Ha
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  const args = ['Hello!!!!!!!!'];
-  await deploy('Greeter', {
+  // const args = ['Hello!!!!!!!!'];
+  await deploy('BettingPoolFactory', {
     // Learn more about args here: https://www.npmjs.com/package/hardhat-deploy#deploymentsdeploy
-    args: args,
+    // args: args,
     from: deployer,
     log: true,
   });
@@ -16,4 +16,4 @@ const main: DeployFunction = async function ({getNamedAccounts, deployments}: Ha
 
 export default main;
  
-export const tags = ['all', 'greeter'];
+export const tags = ['all', 'BettingPoolFactory'];
