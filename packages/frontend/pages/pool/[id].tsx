@@ -4,24 +4,9 @@ import { addressShortener } from "@/utils/addressShortener";
 import { useContract, useSigner } from "wagmi";
 import { FAKE_ADDRESS, NETWORK_ID } from "@/config";
 import contracts from "@/contracts/hardhat_contracts.json";
-import { Pool, Transaction } from "@/types";
+import { Pool, Bet } from "@/types";
 import { ethers } from "ethers";
 import Link from "next/link";
-
-const transactions: Transaction[] = [
-  {
-    user: "0x000",
-    amount: "100",
-    bet: "Heads",
-    type: "Deposit",
-  },
-  {
-    user: "0x000",
-    amount: "100",
-    bet: "Heads",
-    type: "Withdraw",
-  },
-];
 
 const chainId = Number(NETWORK_ID);
 const allContracts = contracts as any;
@@ -37,6 +22,8 @@ const PoolDetails = () => {
   const { id: poolAddress } = router.query;
   const { data: signerData } = useSigner();
   const [signerAddress, setSignerAddress] = useState("");
+  const [userOutcome, setUserOutcome] = useState(false);
+  const [userProfit, setUserProfit] = useState("");
   const poolContract = useContract({
     addressOrName: poolAddress?.toString() ?? FAKE_ADDRESS,
     contractInterface: bettingPoolABI,
@@ -60,16 +47,24 @@ const PoolDetails = () => {
     const totalAmount = await poolContract.totalAmount();
     const ownerAddress = await poolContract.owner();
     const resultControllerAddress = await poolContract?.resultController();
+    const betPlacedFilter = await poolContract.filters.betPlaced();
+    const totalYield = await poolContract.getTotalYield();
+    const betEvents = await poolContract.queryFilter(betPlacedFilter);
     const signerAddress = await signerData?.getAddress();
     const optionCount = Number(
       (await poolContract.getOptionsCount()).toString()
     );
-    let optionNames = [];
+    let optionNames: string[] = [];
     for (let index = 0; index < optionCount; index++) {
       const optionEncoded = await poolContract.getOptionName(index);
       const optionDecoded = ethers.utils.parseBytes32String(optionEncoded);
       optionNames.push(optionDecoded);
     }
+    const bets = betEvents.map((event: any) => ({
+      sender: event.args.user,
+      optionName: optionNames[Number(event.args.option.toString())],
+      amount: event.args.amount.toString()
+    }))
     let status: "open" | "closed" | "yielding";
     if (openForBets) {
       status = "open";
@@ -82,8 +77,12 @@ const PoolDetails = () => {
     }
     // get result name
     let result;
+    let userResult;
+    let userProfit;
     if (hasResult) {
       const optionIndex = await poolContract.getResult();
+      userResult = await poolContract.bets(signerAddress, optionIndex);
+      userProfit = await poolContract.getUserProfit(signerAddress);
       const optionName = await poolContract.getOptionName(optionIndex);
       const resultName = ethers.utils.parseBytes32String(optionName);
       result = resultName;
@@ -98,8 +97,12 @@ const PoolDetails = () => {
       result: result,
       options: optionNames,
       resultControllerAddress: resultControllerAddress,
-      owner: ownerAddress
+      owner: ownerAddress,
+      bets: bets,
+      totalYield: ethers.utils.formatUnits(totalYield.toString())
     });
+    setUserOutcome(userResult.gt(0))
+    setUserProfit(ethers.utils.formatUnits(userProfit.toString(), 18))
   };
 
   const closePool = async () => {
@@ -143,20 +146,35 @@ const PoolDetails = () => {
           <h3 className="text-xl font-semibold text-white">
             Status: {pool?.status}
           </h3>
+          {
+            !!pool?.result && (
+              <h3 className="text-xl font-semibold text-white">
+                yielded: {pool?.totalYield}
+              </h3>
+            )
+          }
         </div>
         <div className="bg-sDark flex flex-col items-center h-64 p-4">
           <div className="self-end flex space-x-4">
             {signerAddress === pool?.owner ? ownerButton() : ""}
             <BetModalButton pool={pool} />
-            <button className="btn bg-pPurple text-white" onClick={withdraw}>Withdraw</button>
+            <button className="btn bg-pPurple text-white" onClick={withdraw}>
+              Withdraw
+            </button>
           </div>
           <h4 className="text-white">Game: {pool?.game}</h4>
-          <div>animation</div>
+          <div>
+            {pool?.result
+              ? userOutcome
+                ? `You won ${userProfit}`
+                : "You lost"
+              : "Pool still has not generated a result"}
+          </div>
           <div>outcome: {pool?.result ?? "no result yet"}</div>
         </div>
         <div className="flex flex-col space-y-4">
           <h2 className="text-3xl font-bold text-white self-center sm:self-start">
-            Transactions
+            Bets
           </h2>
           <div className="overflow-x-auto">
             <table className="table w-full">
@@ -165,16 +183,14 @@ const PoolDetails = () => {
                   <th>Wallet</th>
                   <th>Outcome</th>
                   <th>Amount</th>
-                  <th>Type</th>
                 </tr>
               </thead>
               <tbody>
-                {transactions.map((item, i) => (
+                {pool?.bets?.map((item, i) => (
                   <tr key={i} className="hover">
-                    <th>{item.user}</th>
-                    <td>{item.bet}</td>
-                    <td>{item.amount ? "Open" : "Closed"}</td>
-                    <td>{`${item.type}`}</td>
+                    <th>{addressShortener(item.sender)}</th>
+                    <td>{item.optionName}</td>
+                    <td>{ethers.utils.formatUnits(item.amount, 18)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -208,9 +224,8 @@ const BetModalButton = (props: { pool?: Pool }) => {
     if (signerData && tokenContract) {
       fetchAllowance()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   } ,[signerData, tokenContract, props])
-  // bring options
-  // amount
   const handleChange = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> ) => {
     const {value, name} = e.target
     setForm((prev) => ({...prev, [name]: value}))
@@ -221,8 +236,6 @@ const BetModalButton = (props: { pool?: Pool }) => {
     const userAddress = await signerData?.getAddress()
     if (userAddress && tokenContract &&  props.pool?.address) {
       const allowance = await tokenContract?.allowance(userAddress, props.pool?.address)
-      console.log(allowance.toString())
-
       setAllowance(allowance.toString())
     }
   }
@@ -233,9 +246,9 @@ const BetModalButton = (props: { pool?: Pool }) => {
     if (allowance && allowance === "0") {
       const allowanceTxn = await tokenContract.approve(props.pool?.address, ethers.constants.MaxUint256.toString())
       await allowanceTxn.wait()
-      await poolContract.bet(optionIndex?.toString(), form.amount.toString())
+      await poolContract.bet(optionIndex?.toString(), ethers.utils.parseUnits(form.amount.toString(), 18))
     } else {
-      await poolContract.bet(optionIndex?.toString(), form.amount.toString())
+      await poolContract.bet(optionIndex?.toString(), ethers.utils.parseUnits(form.amount.toString()))
     }
   }
 

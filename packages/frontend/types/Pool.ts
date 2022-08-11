@@ -1,3 +1,5 @@
+import { Bet } from "./Bet";
+
 export type Pool = {
     address: string;
     game: string;
@@ -8,5 +10,7 @@ export type Pool = {
     owner?: string;
     resultControllerAddress?: string;
     options?: string[];
+    bets?: Bet[];
+    totalYield?: string;
   };
   
