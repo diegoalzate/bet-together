@@ -38,7 +38,7 @@ contract BettingPool is Ownable {
   modifier onlyIfOpen() {
     require(
       openForBets,
-      "Pool is closed"
+      "Pool is closed now"
     );
     _;
   }
@@ -133,6 +133,15 @@ contract BettingPool is Ownable {
 
   function getTotalYield () public view returns(uint256) {
     return yieldSrc.getYield(); // TODO: get yield from yieldSource
+  }
+
+  function totalAmount () public view returns (uint256) {
+    uint256 count = getOptionsCount();
+    uint256 amount = 0;
+    for (uint i = 0; i<count; ++i) { 
+      amount += optionTotalBets[i];
+    }
+    return amount;
   }
 
 }
