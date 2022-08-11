@@ -5,6 +5,7 @@ import { useContract, useSigner } from "wagmi";
 import { NETWORK_ID } from "@/config";
 import contracts from "@/contracts/hardhat_contracts.json";
 import { Pool, Transaction } from "@/types";
+import { ethers } from "ethers";
 
 const transactions: Transaction[] = [
   {
@@ -56,12 +57,21 @@ const PoolDetails = () => {
         status = "yielding";
       }
     }
+    // get result name
+    let result;
+    if (hasResult) {
+      const optionIndex = await poolContract.getResult();
+      const optionName = await poolContract.optionName(optionIndex);
+      const resultName = ethers.utils.parseBytes32String(optionName)
+      result = resultName;
+    }
     setPool({
       address: poolAddress?.toString() ?? "",
       amount: totalAmount,
       status: status,
       coin: "USDC",
       game: "Coin Flip",
+      result: result
     });
   };
   return (
@@ -77,12 +87,12 @@ const PoolDetails = () => {
         </div>
         <div className="bg-sDark flex flex-col items-center h-64 p-4">
           <div className="self-end flex space-x-4">
-            <button className="btn  bg-pBlue text-white">Deposit</button>
+            <button className="btn  bg-pBlue text-white">Bet</button>
             <button className="btn  bg-pPurple text-white">Withdraw</button>
           </div>
           <h4 className="text-white">Game: {pool?.game}</h4>
           <div>animation</div>
-          <div>outcome</div>
+          <div>outcome: {pool?.result ?? "no result yet"}</div>
         </div>
         <div className="flex flex-col space-y-4">
           <h2 className="text-3xl font-bold text-white self-center sm:self-start">

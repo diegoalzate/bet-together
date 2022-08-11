@@ -4,5 +4,6 @@ export type Pool = {
     status: "open" | "closed" | "yielding";
     amount: number;
     coin: string;
+    result?: string;
   };
   
