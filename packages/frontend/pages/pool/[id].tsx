@@ -157,7 +157,7 @@ const PoolDetails = () => {
         <div className="bg-sDark flex flex-col items-center h-64 p-4">
           <div className="self-end flex space-x-4">
             {signerAddress === pool?.owner ? ownerButton() : ""}
-            {pool?.status === "open" && <BetModalButton pool={pool} />}
+            {pool?.status === "open" && <BetModalButton pool={pool} callback={fetchPool}/>}
             <button className="btn bg-pPurple text-white" onClick={withdraw}>
               Withdraw
             </button>
@@ -202,9 +202,9 @@ const PoolDetails = () => {
   );
 };
 
-const BetModalButton = (props: { pool?: Pool }) => {
+const BetModalButton = (props: { pool?: Pool, callback?: () => void }) => {
   const [form, setForm ] = useState({
-    option: "",
+    option: props.pool?.options?.[0],
     amount: 0
   })
   const { data: signerData } = useSigner();
@@ -232,7 +232,6 @@ const BetModalButton = (props: { pool?: Pool }) => {
   }
 
   const fetchAllowance = async () => {
-    console.log("fetching")
     const userAddress = await signerData?.getAddress()
     if (userAddress && tokenContract &&  props.pool?.address) {
       const allowance = await tokenContract?.allowance(userAddress, props.pool?.address)
@@ -246,9 +245,17 @@ const BetModalButton = (props: { pool?: Pool }) => {
     if (allowance && allowance === "0") {
       const allowanceTxn = await tokenContract.approve(props.pool?.address, ethers.constants.MaxUint256.toString())
       await allowanceTxn.wait()
-      await poolContract.bet(optionIndex?.toString(), ethers.utils.parseUnits(form.amount.toString(), 18))
+      const betTxn = await poolContract.bet(optionIndex?.toString(), ethers.utils.parseUnits(form.amount.toString(), 18))
+      await betTxn.wait()
+      if (props.callback) {
+        await props.callback()
+      }
     } else {
-      await poolContract.bet(optionIndex?.toString(), ethers.utils.parseUnits(form.amount.toString()))
+      const betTxn = await poolContract.bet(optionIndex?.toString(), ethers.utils.parseUnits(form.amount.toString()))
+      await betTxn.wait()
+      if (props.callback) {
+        await props.callback()
+      }
     }
   }
 
