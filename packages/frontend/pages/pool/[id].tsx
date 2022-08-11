@@ -101,8 +101,8 @@ const PoolDetails = () => {
       bets: bets,
       totalYield: ethers.utils.formatUnits(totalYield.toString())
     });
-    setUserOutcome(userResult.gt(0))
-    setUserProfit(ethers.utils.formatUnits(userProfit.toString(), 18))
+    setUserOutcome(userResult && userResult.gt(0))
+    setUserProfit(userProfit ? ethers.utils.formatUnits(userProfit.toString(), 18) : "")
   };
 
   const closePool = async () => {
