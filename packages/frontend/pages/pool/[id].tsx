@@ -28,19 +28,27 @@ const allContracts = contracts as any;
 const bettingPoolABI = allContracts[chainId][0].contracts.BettingPool.abi;
 const myTokenAddress = allContracts[chainId][0].contracts.MyToken.address
 const myTokenABI = allContracts[chainId][0].contracts.MyToken.abi
+const resultControllerAddress = allContracts[chainId][0].contracts.notQuiteRandomCoinFlip.address;
+const resultControllerABI = allContracts[chainId][0].contracts.notQuiteRandomCoinFlip.abi;
 
 const PoolDetails = () => {
+  const [pool, setPool] = useState<Pool>();
   const router = useRouter();
   const { id: poolAddress } = router.query;
   const { data: signerData } = useSigner();
+  const [signerAddress, setSignerAddress] = useState("");
   const poolContract = useContract({
     addressOrName: poolAddress?.toString() ?? FAKE_ADDRESS,
     contractInterface: bettingPoolABI,
     signerOrProvider: signerData || undefined,
   });
-  const [pool, setPool] = useState<Pool>();
+  const resultControllerContract = useContract({
+    addressOrName: pool?.resultControllerAddress?.toString() ?? FAKE_ADDRESS,
+    contractInterface: resultControllerABI,
+    signerOrProvider: signerData || undefined,
+  });
   useEffect(() => {
-    if (signerData) {
+    if (signerData && poolContract) {
       fetchPool();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,6 +58,9 @@ const PoolDetails = () => {
     const openForBets = await poolContract.openForBets();
     const hasResult = await poolContract.hasResult();
     const totalAmount = await poolContract.totalAmount();
+    const ownerAddress = await poolContract.owner();
+    const resultControllerAddress = await poolContract?.resultController();
+    const signerAddress = await signerData?.getAddress();
     const optionCount = Number(
       (await poolContract.getOptionsCount()).toString()
     );
@@ -73,10 +84,11 @@ const PoolDetails = () => {
     let result;
     if (hasResult) {
       const optionIndex = await poolContract.getResult();
-      const optionName = await poolContract.optionName(optionIndex);
+      const optionName = await poolContract.getOptionName(optionIndex);
       const resultName = ethers.utils.parseBytes32String(optionName);
       result = resultName;
     }
+    setSignerAddress(signerAddress as string)
     setPool({
       address: poolAddress?.toString() ?? "",
       amount: totalAmount,
@@ -85,8 +97,40 @@ const PoolDetails = () => {
       game: "Coin Flip",
       result: result,
       options: optionNames,
+      resultControllerAddress: resultControllerAddress,
+      owner: ownerAddress
     });
   };
+
+  const closePool = async () => {
+    const closeTx = await poolContract.lockPool()
+    await closeTx.wait()
+  }
+
+  const generateResult = async () => {
+    const generateTx = await resultControllerContract.generateResult();
+    await generateTx.wait()
+  }
+
+  const withdraw = async () => {
+    const withdrawTx = await poolContract.withdraw()
+    await withdrawTx.wait()
+  }
+
+  const ownerButton = () => {
+    let btn;
+    if (pool?.status === "open") {
+      btn = (
+        <button className="btn  bg-pPurple text-white" onClick={closePool}>close pool</button>
+      )
+    } else if (pool?.status === "yielding" && pool?.resultControllerAddress) {
+      btn = (
+        <button className="btn  bg-pPurple text-white" onClick={generateResult}>generate result</button>
+      )
+    }
+    return btn
+  }
+
   return (
     <>
       <div className="flex flex-col space-y-8">
@@ -102,8 +146,9 @@ const PoolDetails = () => {
         </div>
         <div className="bg-sDark flex flex-col items-center h-64 p-4">
           <div className="self-end flex space-x-4">
+            {signerAddress === pool?.owner ? ownerButton() : ""}
             <BetModalButton pool={pool} />
-            <button className="btn  bg-pPurple text-white">Withdraw</button>
+            <button className="btn bg-pPurple text-white" onClick={withdraw}>Withdraw</button>
           </div>
           <h4 className="text-white">Game: {pool?.game}</h4>
           <div>animation</div>
