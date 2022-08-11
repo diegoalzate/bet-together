@@ -86,7 +86,7 @@ const PoolRow = (props: { index: number }) => {
   });
   const [pool, setPool] = useState<Pool>()
   useEffect(() => {
-    if (signerData) {
+    if (signerData && poolContract && poolAddress?.toString()) {
       fetchPool()
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
