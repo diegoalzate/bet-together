@@ -38,7 +38,7 @@ contract BettingPool is Ownable {
   modifier onlyIfOpen() {
     require(
       openForBets,
-      "Pool is closed now"
+      "Pool is closed"
     );
     _;
   }

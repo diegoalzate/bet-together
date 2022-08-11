@@ -177,7 +177,7 @@
       "chainId": "80001",
       "contracts": {
         "BettingPool": {
-          "address": "0x8aFb5073577124C08e015E16665c7b1c2b8080d6",
+          "address": "0xDB2e1dCAb0e1f28EDec67165c0d40C7DCb2B89aB",
           "abi": [
             {
               "inputs": [
@@ -610,7 +610,7 @@
           ]
         },
         "BettingPoolFactory": {
-          "address": "0x666A3e753429E9e3c100bf2D25f9fdc7e6662B94",
+          "address": "0xc437c08b775a4f2137eEB1b9821Be48a4Bc3873D",
           "abi": [
             {
               "anonymous": false,
