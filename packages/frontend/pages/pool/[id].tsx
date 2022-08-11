@@ -157,7 +157,7 @@ const PoolDetails = () => {
         <div className="bg-sDark flex flex-col items-center h-64 p-4">
           <div className="self-end flex space-x-4">
             {signerAddress === pool?.owner ? ownerButton() : ""}
-            <BetModalButton pool={pool} />
+            {pool?.status === "open" && <BetModalButton pool={pool} />}
             <button className="btn bg-pPurple text-white" onClick={withdraw}>
               Withdraw
             </button>
