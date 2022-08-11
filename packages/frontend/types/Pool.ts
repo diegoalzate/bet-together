@@ -5,5 +5,6 @@ export type Pool = {
     amount: number;
     coin: string;
     result?: string;
+    options?: string[]
   };
   

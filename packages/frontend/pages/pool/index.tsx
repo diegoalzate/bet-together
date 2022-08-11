@@ -1,11 +1,12 @@
 /* eslint-disable react/no-unescaped-entities */
 import Link from "next/link";
 import { useContract, useContractRead, useContractWrite, useSigner } from "wagmi";
-import { NETWORK_ID, USDC_TESTNETMINTABLE_POLYGON } from "@/config";
+import { FAKE_ADDRESS, NETWORK_ID, USDC_TESTNETMINTABLE_POLYGON } from "@/config";
 import contracts from "@/contracts/hardhat_contracts.json";
 import { useEffect, useState } from "react";
 import { addressShortener } from "@/utils/addressShortener";
 import { Pool } from "@/types";
+import { ethers } from "ethers";
 const chainId = Number(NETWORK_ID);
 const allContracts = contracts as any;
 const bettingPoolFactoryAddress =
@@ -13,6 +14,7 @@ const bettingPoolFactoryAddress =
 const bettingPoolFactoryABI =
   allContracts[chainId][0].contracts.BettingPoolFactory.abi;
 const bettingPoolABI = allContracts[chainId][0].contracts.BettingPool.abi;
+const myTokenAddress = allContracts[chainId][0].contracts.MyToken.address
 
 const Pool = () => {
   const { data: poolCount, isLoading: poolCountIsLoading } = useContractRead({
@@ -29,7 +31,7 @@ const Pool = () => {
     addressOrName: bettingPoolFactoryAddress,
     contractInterface: bettingPoolFactoryABI,
     functionName: "createDefaultPool",
-    args: [USDC_TESTNETMINTABLE_POLYGON],
+    args: [myTokenAddress],
   });
   return (
     <>
@@ -57,11 +59,9 @@ const Pool = () => {
               </tr>
             </thead>
             <tbody>
-              {[...Array.from({ length: +(poolCount?.toString() ?? 0) })].map(
-                (item, i) => (
-                  <PoolRow key={i} index={i} />
-                )
-              )}
+              {[...Array.from({ length: +(poolCount?.toString() ?? 0) })]
+                .map((item, i) => <PoolRow key={i} index={i} />)
+                .reverse()}
             </tbody>
           </table>
         </div>
@@ -80,7 +80,7 @@ const PoolRow = (props: { index: number }) => {
     });
     const { data: signerData } = useSigner();
   const poolContract = useContract({
-    addressOrName: poolAddress?.toString() ?? "",
+    addressOrName: poolAddress?.toString() ?? FAKE_ADDRESS,
     contractInterface: bettingPoolABI,
     signerOrProvider: signerData || undefined,
   });
@@ -108,9 +108,9 @@ const PoolRow = (props: { index: number }) => {
     }
     setPool({
       address: poolAddress?.toString() ?? "",
-      amount: totalAmount,
+      amount: Number(ethers.utils.formatUnits(totalAmount, 18)),
       status: status,
-      coin: "USDC",
+      coin: "MTK",
       game: "Coin Flip", 
     })
   }
