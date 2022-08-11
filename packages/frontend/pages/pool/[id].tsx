@@ -108,11 +108,13 @@ const PoolDetails = () => {
   const closePool = async () => {
     const closeTx = await poolContract.lockPool()
     await closeTx.wait()
+    await fetchPool()
   }
 
   const generateResult = async () => {
     const generateTx = await resultControllerContract.generateResult();
     await generateTx.wait()
+    await fetchPool()
   }
 
   const withdraw = async () => {
