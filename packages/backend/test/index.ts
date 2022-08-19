@@ -58,7 +58,7 @@ describe("BettingPool", function () {
     const contract = fakeCoinFlipContract;
     const beforeHasResult = await contract.hasResult();
     expect(beforeHasResult).to.equal(false);
-    const tx = await contract.setResult(option);
+    const tx = await contract.generateResult(option);
     await tx.wait();
     const afterHasResult = await contract.hasResult();
     expect(afterHasResult).to.equal(true);
@@ -285,3 +285,27 @@ describe("BettingPool", function () {
   })
 
 });
+
+
+// describe("VRFMock", function () {
+//   let owner: SignerWithAddress;
+//   let hardhatOurNFTContract, hardhatVrfCoordinatorV2Mock;
+
+//   beforeEach(async () => {
+//     [owner] = await ethers.getSigners();
+//     // let ourNFTContract = await ethers.getContractFactory("OurNFTContract");
+//     let vrfCoordinatorV2Mock = await ethers.getContractFactory("VRFCoordinatorV2Mock");
+
+//     hardhatVrfCoordinatorV2Mock = await vrfCoordinatorV2Mock.deploy(0, 0);
+
+//     await hardhatVrfCoordinatorV2Mock.createSubscription();
+
+//     await hardhatVrfCoordinatorV2Mock.fundSubscription(1, ethers.utils.parseEther("7"))
+
+//     // hardhatOurNFTContract = await ourNFTContract.deploy(1, hardhatVrfCoordinatorV2Mock.address);
+//   })
+
+//   it("Run before each", () =>{
+    
+//   })
+// })
