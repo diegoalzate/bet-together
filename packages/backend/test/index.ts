@@ -286,26 +286,43 @@ describe("BettingPool", function () {
 
 });
 
+describe("VRFMock", function () {
+  let owner: SignerWithAddress;
+  let vrfResultFactoryContract: any, hardhatVrfCoordinatorV2Mock: any;
 
-// describe("VRFMock", function () {
-//   let owner: SignerWithAddress;
-//   let hardhatOurNFTContract, hardhatVrfCoordinatorV2Mock;
+  beforeEach(async () => {
+    [owner] = await ethers.getSigners();
+    let vrfResultFactoryFactory = await ethers.getContractFactory("VRFResultFactory");
+    let vrfCoordinatorV2Mock = await ethers.getContractFactory("VRFCoordinatorV2Mock");
 
-//   beforeEach(async () => {
-//     [owner] = await ethers.getSigners();
-//     // let ourNFTContract = await ethers.getContractFactory("OurNFTContract");
-//     let vrfCoordinatorV2Mock = await ethers.getContractFactory("VRFCoordinatorV2Mock");
+    hardhatVrfCoordinatorV2Mock = await vrfCoordinatorV2Mock.deploy(0, 0);
 
-//     hardhatVrfCoordinatorV2Mock = await vrfCoordinatorV2Mock.deploy(0, 0);
+    await hardhatVrfCoordinatorV2Mock.createSubscription();
 
-//     await hardhatVrfCoordinatorV2Mock.createSubscription();
+    await hardhatVrfCoordinatorV2Mock.fundSubscription(1, ethers.utils.parseEther("7"))
 
-//     await hardhatVrfCoordinatorV2Mock.fundSubscription(1, ethers.utils.parseEther("7"))
-
-//     // hardhatOurNFTContract = await ourNFTContract.deploy(1, hardhatVrfCoordinatorV2Mock.address);
-//   })
-
-//   it("Run before each", () =>{
+    vrfResultFactoryContract = await vrfResultFactoryFactory.deploy(hardhatVrfCoordinatorV2Mock.address, 1);
     
-//   })
-// })
+    const tx = await hardhatVrfCoordinatorV2Mock.addConsumer(1, vrfResultFactoryContract.address);
+    await tx.wait();
+  })
+
+  it("Simple vrf controller test", async () =>{
+    const createTx = await vrfResultFactoryContract.createCoinFlipController();
+    let { events } = await createTx.wait();
+    // console.log(events);
+    let [owner, vrfResultControllerAddress] = events.filter( (x: any) => x.event === 'coinFlipCreated')[0].args;
+    // console.log("address", vrfResultControllerAddress);
+    const VRFCoinFlipFactory = await ethers.getContractFactory("VRFCoinFlip");
+    const VRFCoinFlip = VRFCoinFlipFactory.attach(vrfResultControllerAddress);
+    const generateResultTx = await VRFCoinFlip.generateResult();
+    let {events: generateResultEvents} = await generateResultTx.wait();
+    // console.log(generateResultEvents);
+    let [requestId] = generateResultEvents.filter( (x: any) => x.event === 'resultGenerationRequested')[0].args;
+    const beforeHasResult = await VRFCoinFlip.hasResult();
+    expect(beforeHasResult).to.equal(false);
+    const fulfillTx = await hardhatVrfCoordinatorV2Mock.fulfillRandomWords(requestId, vrfResultFactoryContract.address);
+    const afterHasResult = await VRFCoinFlip.hasResult();
+    expect(afterHasResult).to.equal(true);
+  })
+})

@@ -37,10 +37,14 @@ contract baseResultController is IResultController {
   }
 
   function getOptionsCount () external view override returns (uint256) {
-    return optionNames.length;
+    return _getOptionsCount();
   }
   
   function getOptionName (uint256 index) external view override returns (bytes32) {
     return optionNames[index];
+  }
+
+  function _getOptionsCount () public view returns (uint256) {
+    return optionNames.length;
   }
 }
