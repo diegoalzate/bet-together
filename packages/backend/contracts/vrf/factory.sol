@@ -58,8 +58,8 @@ contract VRFResultFactory is VRFConsumerBaseV2, Ownable {
   }
 
   // TODO make it generic random game
-  function createCoinFlipController () public returns(address) {
-    VRFCoinFlip c = new VRFCoinFlip(msg.sender, address(this));
+  function createCoinFlipController (address owner) public returns(address) {
+    VRFCoinFlip c = new VRFCoinFlip(owner, address(this));
     address newCoinFlipAddr = address(c);
     consumers[newCoinFlipAddr] = true;
     emit coinFlipCreated(msg.sender, newCoinFlipAddr);

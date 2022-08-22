@@ -9,8 +9,12 @@ describe("BettingPool", function () {
   let tokenContract: any;
   let fakeCoinFlipContract: any;
   let notQuiteRandomCoinFlipContract: any;
+  let vrfCoinFlipContract: any;
+  let vrfResultFactoryContract: any;
+  let hardhatVrfCoordinatorV2Mock: any;
   let yieldContract: any;
   let accounts: SignerWithAddress[];
+  let totalPoolCount = 0;
 
   const getPoolContract = async (index: any) => { // BigNumberish
     const bettingPoolFactory = await ethers.getContractFactory("BettingPool");
@@ -77,6 +81,23 @@ describe("BettingPool", function () {
     const result = await contract.getResult();
   }
 
+  const generateVRFResult = async () => {
+    const contract = vrfCoinFlipContract;
+    const beforeHasResult = await contract.hasResult();
+    expect(beforeHasResult).to.equal(false);
+    const tx = await contract.generateResult();
+    await tx.wait();
+    // mock fulfill
+    let {events} = await tx.wait();
+    let [requestId] = events.filter( (x: any) => x.event === 'resultGenerationRequested')[0].args;
+    const fulfillTx = await hardhatVrfCoordinatorV2Mock.fulfillRandomWords(requestId, vrfResultFactoryContract.address);
+    await fulfillTx.wait();
+    //check result
+    const afterHasResult = await contract.hasResult();
+    expect(afterHasResult).to.equal(true);
+    const result = await contract.getResult();
+  }
+
   const withdraw = async (pool: number, account: SignerWithAddress) => {
     const connectedToken = await tokenContract.connect(account);
     const beforeTokenBalance = await connectedToken.balanceOf(account.address);
@@ -130,9 +151,11 @@ describe("BettingPool", function () {
                                                   fakeCoinFlipContract.address,
                                                   yieldContract.address);
     await tx.wait();
+    totalPoolCount++;
   }
-  const createDefaultPool = async () => {
-    const tx = await poolFactoryContract.createDefaultPool(tokenContract.address);
+
+  const createNotQuiteRandomPool = async () => {
+    const tx = await poolFactoryContract.createNotQuiteRandomPool(tokenContract.address);
     await tx.wait();
     // get pool contract
     const poolCount = await poolFactoryContract.poolCount(); 
@@ -141,6 +164,32 @@ describe("BettingPool", function () {
     const coinFlipFactory = await ethers.getContractFactory("notQuiteRandomCoinFlip");
     const coinFlipAddress = await pollContract.resultController();
     notQuiteRandomCoinFlipContract = coinFlipFactory.attach(coinFlipAddress);
+    totalPoolCount++;
+  }
+
+  const deployVRFResultFactory = async () => {
+    const vrfResultFactoryFactory = await ethers.getContractFactory("VRFResultFactory");
+    const vrfCoordinatorV2Mock = await ethers.getContractFactory("VRFCoordinatorV2Mock");
+    hardhatVrfCoordinatorV2Mock = await vrfCoordinatorV2Mock.deploy(0, 0);
+    await hardhatVrfCoordinatorV2Mock.createSubscription();
+    await hardhatVrfCoordinatorV2Mock.fundSubscription(1, ethers.utils.parseEther("7"))
+    vrfResultFactoryContract = await vrfResultFactoryFactory.deploy(hardhatVrfCoordinatorV2Mock.address, 1);
+    let tx = await hardhatVrfCoordinatorV2Mock.addConsumer(1, vrfResultFactoryContract.address);
+    await tx.wait();
+    tx = await poolFactoryContract.setVrfFactory(vrfResultFactoryContract.address);
+    await tx.wait();
+  }
+  
+  const createVRFPool = async () => {
+    const tx = await poolFactoryContract.createVRFPool(tokenContract.address);
+    await tx.wait();
+    // get pool contract
+    const poolCount = await poolFactoryContract.poolCount(); 
+    const pollContract = await getPoolContract(poolCount - 1);
+    const coinFlipFactory = await ethers.getContractFactory("VRFCoinFlip");
+    const coinFlipAddress = await pollContract.resultController();
+    vrfCoinFlipContract = coinFlipFactory.attach(coinFlipAddress);
+    totalPoolCount++;
   }
 
   beforeEach(async () => {
@@ -159,12 +208,16 @@ describe("BettingPool", function () {
     // create first pool (fake)
     await createFakePool()
     // // create second pool (notQuiteRandom)
-    await createDefaultPool();
+    await createNotQuiteRandomPool();
+    // await createDefaultPool();
+    // create third pool
+    await deployVRFResultFactory();
+    await createVRFPool();
   });
 
   it ("Check pool count", async () => {
     const poolCount = await poolFactoryContract.poolCount(); 
-    expect(poolCount).to.equal(2);
+    expect(poolCount).to.equal(totalPoolCount);
   })
 
   it("Check pool", async () => {
@@ -205,85 +258,49 @@ describe("BettingPool", function () {
     expect(afterWithdrawBalance).to.equal(110);
   })
 
-  it("Simple fake pool test", async () => {
-    const fakePool = 0;
-    const initialBalances = [100, 200, 300, 400];
-    const len = initialBalances.length;
-    const bets = [0, 0, 1, 1];
+  const simplePoolTest = (poolIndex: number, generateResultCB: Function) => {
+    return async () => {
+      const initialBalances = [100, 200, 300, 400];
+      const len = initialBalances.length;
+      const bets = [0, 0, 1, 1];
 
-    // mint players tokens
-    for (let index=0; index< len; ++index ) {
-      const amount = initialBalances[index];
-      await mint(accounts[index], amount);
-    }
-    
-    // place bets
-    for (let index=0; index< len; ++index ) {
-      const amount = initialBalances[index];
-      const option = bets[index];
-      await placeBet(fakePool, accounts[index], option, amount);
-    }
+      // mint players tokens
+      for (let index=0; index< len; ++index ) {
+        const amount = initialBalances[index];
+        await mint(accounts[index], amount);
+      }
+      
+      // place bets
+      for (let index=0; index< len; ++index ) {
+        const amount = initialBalances[index];
+        const option = bets[index];
+        await placeBet(poolIndex, accounts[index], option, amount);
+      }
 
-    await lockPool(fakePool);
+      await lockPool(poolIndex);
 
-    await generateFakeResult(0);
+      await generateResultCB();
 
-    const poolContract = await getPoolContract(fakePool);
-    const result = await poolContract.getResult();
-    for (let index=0; index< len; ++index ) {
-      await withdraw(fakePool, accounts[index]);
-      const address = accounts[index].address;
-      const balance = await tokenContract.balanceOf(address);
-      // check if principal was preserved
-      expect(balance.toNumber()).to.greaterThanOrEqual(initialBalances[index]);
-      const bet = await poolContract.bets(address, result);
-      if (bet.toNumber() > 0) {
-        // if user has a winning bet, his balance should be greater than the initial balance
-        expect(balance.toNumber()).to.greaterThan(initialBalances[index]);
+      const poolContract = await getPoolContract(poolIndex);
+      const result = await poolContract.getResult();
+      for (let index=0; index< len; ++index ) {
+        await withdraw(poolIndex, accounts[index]);
+        const address = accounts[index].address;
+        const balance = await tokenContract.balanceOf(address);
+        // check if principal was preserved
+        expect(balance.toNumber()).to.greaterThanOrEqual(initialBalances[index]);
+        const bet = await poolContract.bets(address, result);
+        if (bet.toNumber() > 0) {
+          // if user has a winning bet, his balance should be greater than the initial balance
+          expect(balance.toNumber()).to.greaterThan(initialBalances[index]);
+        }
       }
     }
+  }
 
-  })
-
-  it("Simple notQuiteRandom pool test", async () => {
-    const notQuiteRandomPool = 1;
-    const initialBalances = [100, 200, 300, 400];
-    const len = initialBalances.length;
-    const bets = [0, 0, 1, 1];
-
-    // mint players tokens
-    for (let index=0; index< len; ++index ) {
-      const amount = initialBalances[index];
-      await mint(accounts[index], amount);
-    }
-    
-    // place bets
-    for (let index=0; index< len; ++index ) {
-      const amount = initialBalances[index];
-      const option = bets[index];
-      await placeBet(notQuiteRandomPool, accounts[index], option, amount);
-    }
-
-    await lockPool(notQuiteRandomPool);
-
-    await generateNotQuiteRandomResult();
-
-    const poolContract = await getPoolContract(notQuiteRandomPool);
-    const result = await poolContract.getResult();
-    for (let index=0; index< len; ++index ) {
-      await withdraw(notQuiteRandomPool, accounts[index]);
-      const address = accounts[index].address;
-      const balance = await tokenContract.balanceOf(address);
-      // check if principal was preserved
-      expect(balance.toNumber()).to.greaterThanOrEqual(initialBalances[index]);
-      const bet = await poolContract.bets(address, result);
-      if (bet.toNumber() > 0) {
-        // if user has a winning bet, his balance should be greater than the initial balance
-        expect(balance.toNumber()).to.greaterThan(initialBalances[index]);
-      }
-    }
-  })
-
+  it("Simple fake pool test", simplePoolTest(0, async () => {await generateFakeResult(0);}));
+  it("Simple notQuiteRandom pool test", simplePoolTest(1, async () => {await generateNotQuiteRandomResult();}));
+  it("Simple vrf pool test", simplePoolTest(2, async () => {await generateVRFResult();}));
 });
 
 describe("VRFMock", function () {
@@ -308,7 +325,8 @@ describe("VRFMock", function () {
   })
 
   it("Simple vrf controller test", async () =>{
-    const createTx = await vrfResultFactoryContract.createCoinFlipController();
+    const accounts = await ethers.getSigners();
+    const createTx = await vrfResultFactoryContract.createCoinFlipController(accounts[0].address);
     let { events } = await createTx.wait();
     // console.log(events);
     let [owner, vrfResultControllerAddress] = events.filter( (x: any) => x.event === 'coinFlipCreated')[0].args;
