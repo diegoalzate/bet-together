@@ -15,6 +15,10 @@ describe("BettingPool", function () {
   let yieldContract: any;
   let accounts: SignerWithAddress[];
   let totalPoolCount = 0;
+  let poolIndex = -1;
+  let fakePoolIndex = ++poolIndex;
+  // let notQuiteRandomPoolIndex = ++poolIndex;
+  let vrfPoolIndex = ++poolIndex;
 
   const getPoolContract = async (index: any) => { // BigNumberish
     const bettingPoolFactory = await ethers.getContractFactory("BettingPool");
@@ -208,7 +212,7 @@ describe("BettingPool", function () {
     // create first pool (fake)
     await createFakePool()
     // // create second pool (notQuiteRandom)
-    await createNotQuiteRandomPool();
+    // await createNotQuiteRandomPool();
     // await createDefaultPool();
     // create third pool
     await deployVRFResultFactory();
@@ -240,9 +244,9 @@ describe("BettingPool", function () {
     await generateFakeResult(0);
   })
 
-  it("Genrate NotQuiteRandom Results test", async () => {
-    await generateNotQuiteRandomResult();
-  })
+  // it("Genrate NotQuiteRandom Results test", async () => {
+  //   await generateNotQuiteRandomResult();
+  // })
 
   it("Fake yield test", async () => {
     const amount = 100;
@@ -298,9 +302,9 @@ describe("BettingPool", function () {
     }
   }
 
-  it("Simple fake pool test", simplePoolTest(0, async () => {await generateFakeResult(0);}));
-  it("Simple notQuiteRandom pool test", simplePoolTest(1, async () => {await generateNotQuiteRandomResult();}));
-  it("Simple vrf pool test", simplePoolTest(2, async () => {await generateVRFResult();}));
+  it("Simple fake pool test", simplePoolTest(fakePoolIndex, async () => {await generateFakeResult(0);}));
+  // it("Simple notQuiteRandom pool test", simplePoolTest(notQuiteRandomPoolIndex, async () => {await generateNotQuiteRandomResult();}));
+  it("Simple vrf pool test", simplePoolTest(vrfPoolIndex, async () => {await generateVRFResult();}));
 });
 
 describe("VRFMock", function () {
