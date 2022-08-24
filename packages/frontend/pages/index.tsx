@@ -26,7 +26,7 @@ const Hero = () => {
             <span className="text-green-400">money</span> on bets
           </h1>
           <p className="py-6">
-            Bet together is a crypto betting protocal that allows you to gamble
+            Bet together is a crypto betting protocol that allows you to gamble
             on different on chain and off chain events without losing a dime.
           </p>
           <Link href={'/pool'}>
