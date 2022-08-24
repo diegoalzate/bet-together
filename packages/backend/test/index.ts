@@ -2,6 +2,8 @@ import { expect } from "chai";
 import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
+const keyHash = "0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f";
+
 describe("BettingPool", function () {
   let poolFactoryFactory: any;
   let poolFactoryContract: any;
@@ -177,7 +179,7 @@ describe("BettingPool", function () {
     hardhatVrfCoordinatorV2Mock = await vrfCoordinatorV2Mock.deploy(0, 0);
     await hardhatVrfCoordinatorV2Mock.createSubscription();
     await hardhatVrfCoordinatorV2Mock.fundSubscription(1, ethers.utils.parseEther("7"))
-    vrfResultFactoryContract = await vrfResultFactoryFactory.deploy(hardhatVrfCoordinatorV2Mock.address, 1);
+    vrfResultFactoryContract = await vrfResultFactoryFactory.deploy(hardhatVrfCoordinatorV2Mock.address, 1, keyHash);
     let tx = await hardhatVrfCoordinatorV2Mock.addConsumer(1, vrfResultFactoryContract.address);
     await tx.wait();
     tx = await poolFactoryContract.setVrfFactory(vrfResultFactoryContract.address);
@@ -213,7 +215,6 @@ describe("BettingPool", function () {
     await createFakePool()
     // // create second pool (notQuiteRandom)
     // await createNotQuiteRandomPool();
-    // await createDefaultPool();
     // create third pool
     await deployVRFResultFactory();
     await createVRFPool();
@@ -322,7 +323,7 @@ describe("VRFMock", function () {
 
     await hardhatVrfCoordinatorV2Mock.fundSubscription(1, ethers.utils.parseEther("7"))
 
-    vrfResultFactoryContract = await vrfResultFactoryFactory.deploy(hardhatVrfCoordinatorV2Mock.address, 1);
+    vrfResultFactoryContract = await vrfResultFactoryFactory.deploy(hardhatVrfCoordinatorV2Mock.address, 1, keyHash);
     
     const tx = await hardhatVrfCoordinatorV2Mock.addConsumer(1, vrfResultFactoryContract.address);
     await tx.wait();
