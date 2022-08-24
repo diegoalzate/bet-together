@@ -30,9 +30,10 @@ contract VRFResultFactory is VRFConsumerBaseV2, Ownable {
     _;
   }
   
-  constructor(address vrfCoordinator, uint64 subscriptionId) VRFConsumerBaseV2(vrfCoordinator) {
+  constructor(address vrfCoordinator, uint64 subscriptionId, bytes32 _keyHash) VRFConsumerBaseV2(vrfCoordinator) {
     COORDINATOR = VRFCoordinatorV2Interface(vrfCoordinator);
     s_subscriptionId = subscriptionId;
+    keyHash = _keyHash;
   }
   
   // Assumes the subscription is funded sufficiently.
