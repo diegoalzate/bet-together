@@ -34,7 +34,8 @@ contract BettingPoolFactory is Ownable {
 
   function createDefaultPool (address token) external returns(uint256) {
     // return createNotQuiteRandomPool(token);
-    return createVRFPool(token);
+    // return createVRFPool(token);
+    return createAaveVRFCoinflipPool(token);
   }
   
   // Commenting it to keep the contract size inside the limit
