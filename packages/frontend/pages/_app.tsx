@@ -39,7 +39,7 @@ const hardhatChain: Chain = {
 };
 
 const { chains, provider } = configureChains(
-  [ chain.polygonMumbai, hardhatChain],
+  [chain.goerli],
   [alchemyProvider({ alchemyId }), publicProvider()]
 );
 

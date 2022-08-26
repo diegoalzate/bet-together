@@ -4,14 +4,13 @@ import {
   useContract,
   useContractRead,
   useContractWrite,
-  useFeeData,
   useSigner,
   useWaitForTransaction,
 } from "wagmi";
 import {
   FAKE_ADDRESS,
   NETWORK_ID,
-  USDC_TESTNETMINTABLE_POLYGON,
+  USDC_TESTNETMINTABLE_GOERLI,
 } from "@/config";
 import contracts from "@/contracts/hardhat_contracts.json";
 import { useEffect, useState } from "react";
@@ -25,7 +24,6 @@ const bettingPoolFactoryAddress =
 const bettingPoolFactoryABI =
   allContracts[chainId][0].contracts.BettingPoolFactory.abi;
 const bettingPoolABI = allContracts[chainId][0].contracts.BettingPool.abi;
-const myTokenAddress = allContracts[chainId][0].contracts.MyToken.address;
 
 const Pool = () => {
   const [poolTransaction, setPoolTransaction] = useState("");
@@ -46,7 +44,7 @@ const Pool = () => {
     addressOrName: bettingPoolFactoryAddress,
     contractInterface: bettingPoolFactoryABI,
     functionName: "createDefaultPool",
-    args: [myTokenAddress],
+    args: [USDC_TESTNETMINTABLE_GOERLI],
   });
 
   useEffect(() => {
@@ -124,7 +122,6 @@ const PoolRow = (props: { index: number }) => {
       poolAddress?.toString() &&
       !poolAddressIsLoading
     ) {
-      console.log(poolContract)
       fetchPool();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,7 +148,7 @@ const PoolRow = (props: { index: number }) => {
           address: poolAddress?.toString() ?? "",
           amount: Number(ethers.utils.formatUnits(totalAmount, 18)),
           status: status,
-          coin: "MTK",
+          coin: "USDC",
           game: "Coin Flip",
         });
       }
