@@ -2,7 +2,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { addressShortener } from "@/utils/addressShortener";
 import { useContract, useSigner } from "wagmi";
-import { FAKE_ADDRESS, NETWORK_ID } from "@/config";
+import { FAKE_ADDRESS, NETWORK_ID, USDC_TESTNETMINTABLE_GOERLI } from "@/config";
 import contracts from "@/contracts/hardhat_contracts.json";
 import { Pool, Bet } from "@/types";
 import { ethers } from "ethers";
@@ -18,6 +18,8 @@ const resultControllerAddress =
   allContracts[chainId][0].contracts.notQuiteRandomCoinFlip.address;
 const resultControllerABI =
   allContracts[chainId][0].contracts.notQuiteRandomCoinFlip.abi;
+// TODO: get decimals from token
+const decimals = 6;
 
 const PoolDetails = () => {
   const [pool, setPool] = useState<Pool>();
@@ -105,11 +107,11 @@ const PoolDetails = () => {
         resultControllerAddress: resultControllerAddress,
         owner: ownerAddress,
         bets: bets,
-        totalYield: ethers.utils.formatUnits(totalYield.toString()),
+        totalYield: ethers.utils.formatUnits(totalYield.toString(), decimals),
       });
       setUserOutcome(userResult && userResult.gt(0));
       setUserProfit(
-        userProfit ? ethers.utils.formatUnits(userProfit.toString(), 18) : ""
+        userProfit ? ethers.utils.formatUnits(userProfit.toString(), decimals) : ""
       );
     } catch (e) {
       console.log(e);
@@ -230,7 +232,7 @@ const PoolDetails = () => {
                   <tr key={i} className="hover">
                     <th>{addressShortener(item.sender)}</th>
                     <td>{item.optionName}</td>
-                    <td>{ethers.utils.formatUnits(item.amount, 18)}</td>
+                    <td>{ethers.utils.formatUnits(item.amount, decimals)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -255,7 +257,8 @@ const BetModalButton = (props: { pool?: Pool; callback?: () => void }) => {
     signerOrProvider: signerData || undefined,
   });
   const tokenContract = useContract({
-    addressOrName: myTokenAddress.toString() ?? FAKE_ADDRESS,
+    //addressOrName: myTokenAddress.toString() ?? FAKE_ADDRESS,
+    addressOrName: USDC_TESTNETMINTABLE_GOERLI,
     contractInterface: myTokenABI,
     signerOrProvider: signerData || undefined,
   });
@@ -301,7 +304,7 @@ const BetModalButton = (props: { pool?: Pool; callback?: () => void }) => {
       await allowanceTxn.wait();
       const betTxn = await poolContract.bet(
         optionIndex?.toString(),
-        ethers.utils.parseUnits(form.amount.toString(), 18)
+        ethers.utils.parseUnits(form.amount.toString(), decimals)
       );
       await betTxn.wait();
       if (props.callback) {

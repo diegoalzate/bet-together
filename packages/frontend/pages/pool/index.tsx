@@ -24,6 +24,8 @@ const bettingPoolFactoryAddress =
 const bettingPoolFactoryABI =
   allContracts[chainId][0].contracts.BettingPoolFactory.abi;
 const bettingPoolABI = allContracts[chainId][0].contracts.BettingPool.abi;
+// TODO: get decimals from token
+const decimals = 6;
 
 const Pool = () => {
   const [poolTransaction, setPoolTransaction] = useState("");
@@ -146,7 +148,7 @@ const PoolRow = (props: { index: number }) => {
         }
         setPool({
           address: poolAddress?.toString() ?? "",
-          amount: Number(ethers.utils.formatUnits(totalAmount, 18)),
+          amount: Number(ethers.utils.formatUnits(totalAmount, decimals)),
           status: status,
           coin: "USDC",
           game: "Coin Flip",
