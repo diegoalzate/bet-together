@@ -2,7 +2,12 @@ import { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { addressShortener } from "@/utils/addressShortener";
 import { useContract, useSigner } from "wagmi";
-import { FAKE_ADDRESS, NETWORK_ID, USDC_TESTNETMINTABLE_GOERLI } from "@/config";
+import {
+  FAKE_ADDRESS,
+  NETWORK_ID,
+  USDC_TESTNETMINTABLE_GOERLI,
+  USDC_TESTNETMINTABLE_GOERLI_URL,
+} from "@/config";
 import contracts from "@/contracts/hardhat_contracts.json";
 import { Pool, Bet } from "@/types";
 import { ethers } from "ethers";
@@ -111,7 +116,9 @@ const PoolDetails = () => {
       });
       setUserOutcome(userResult && userResult.gt(0));
       setUserProfit(
-        userProfit ? ethers.utils.formatUnits(userProfit.toString(), decimals) : ""
+        userProfit
+          ? ethers.utils.formatUnits(userProfit.toString(), decimals)
+          : ""
       );
     } catch (e) {
       console.log(e);
@@ -180,7 +187,17 @@ const PoolDetails = () => {
           <div className="self-end flex space-x-4">
             {signerAddress === pool?.owner ? ownerButton() : ""}
             {pool?.status === "open" && (
-              <BetModalButton pool={pool} callback={fetchPool} />
+              <>
+                <BetModalButton pool={pool} callback={fetchPool} />
+                <button
+                  className="btn bg-pPurple text-white"
+                  onClick={() => {
+                    window.open(USDC_TESTNETMINTABLE_GOERLI_URL);
+                  }}
+                >
+                  USDC FAUCET
+                </button>
+              </>
             )}
             {pool?.status === "closed" && (
               <button className="btn bg-pPurple text-white" onClick={withdraw}>
