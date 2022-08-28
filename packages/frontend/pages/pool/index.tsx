@@ -19,14 +19,22 @@ import { Pool } from "@/types";
 import { ethers } from "ethers";
 const chainId = Number(NETWORK_ID);
 const allContracts = contracts as any;
+
 const bettingPoolFactoryAddress =
   allContracts[chainId][0].contracts.BettingPoolFactory.address;
 const bettingPoolFactoryABI =
   allContracts[chainId][0].contracts.BettingPoolFactory.abi;
+
 const aaveVrfCoinflipbettingPoolFactoryAddress =
   allContracts[chainId][0].contracts.aaveVrfCoinflipBettingPoolFactory.address;
 const aaveVrfCoinflipbettingPoolFactoryABI =
   allContracts[chainId][0].contracts.aaveVrfCoinflipBettingPoolFactory.abi;
+
+const aaveFakeWorldCupBettingPoolFactoryAddress =
+  allContracts[chainId][0].contracts.aaveFakeWorldCupBettingPoolFactory.address;
+const aaveFakeWorldCupBettingPoolFactoryABI =
+  allContracts[chainId][0].contracts.aaveFakeWorldCupBettingPoolFactory.abi;
+
 const bettingPoolABI = allContracts[chainId][0].contracts.BettingPool.abi;
 // TODO: get decimals from token
 const decimals = 6;
@@ -49,6 +57,8 @@ const Pool = () => {
   const { writeAsync, isLoading: createIsLoading } = useContractWrite({
     addressOrName: aaveVrfCoinflipbettingPoolFactoryAddress,
     contractInterface: aaveVrfCoinflipbettingPoolFactoryABI,
+    // addressOrName: aaveFakeWorldCupBettingPoolFactoryAddress,
+    // contractInterface: aaveFakeWorldCupBettingPoolFactoryABI,
     functionName: "createPool",
     args: [USDC_TESTNETMINTABLE_GOERLI],
   });

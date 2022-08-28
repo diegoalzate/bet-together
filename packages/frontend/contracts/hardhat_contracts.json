@@ -1181,6 +1181,90 @@
             }
           ]
         },
+        "aaveVrfCoinflipBettingPoolFactory": {
+          "address": "0xfeDA74d8c705376901767e8c21119b4e62a370f8",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "factory",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_aaveAddressProvider",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_vrfFactory",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "inputs": [],
+              "name": "aaveAddressProvider",
+              "outputs": [
+                {
+                  "internalType": "contract IPoolAddressesProvider",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "bettingPoolFactory",
+              "outputs": [
+                {
+                  "internalType": "contract BettingPoolFactory",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                }
+              ],
+              "name": "createPool",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "vrfFactory",
+              "outputs": [
+                {
+                  "internalType": "contract VRFResultFactory",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            }
+          ]
+        },
         "notQuiteRandomCoinFlip": {
           "address": "0x8d9055d4142199Fe474A9E2BdB9390B8A839efCc",
           "abi": [
@@ -1410,8 +1494,8 @@
             }
           ]
         },
-        "aaveVrfCoinflipBettingPoolFactory": {
-          "address": "0xfeDA74d8c705376901767e8c21119b4e62a370f8",
+        "aaveFakeWorldCupBettingPoolFactory": {
+          "address": "0xE31efeBA07e26d962f9Ef60800cf382fC0ec38EF",
           "abi": [
             {
               "inputs": [
@@ -1423,11 +1507,6 @@
                 {
                   "internalType": "address",
                   "name": "_aaveAddressProvider",
-                  "type": "address"
-                },
-                {
-                  "internalType": "address",
-                  "name": "_vrfFactory",
                   "type": "address"
                 }
               ],
@@ -1477,19 +1556,6 @@
                 }
               ],
               "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "vrfFactory",
-              "outputs": [
-                {
-                  "internalType": "contract VRFResultFactory",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
               "type": "function"
             }
           ]
