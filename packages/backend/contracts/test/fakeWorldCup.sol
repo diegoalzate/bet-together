@@ -42,7 +42,7 @@ contract fakeWorldCup is baseResultController, Ownable {
     transferOwnership(owner);
   }
 
-  function generateResult (uint256 r) external {
+  function generateResult (uint256 r) external onlyOwner {
     setResult(r);
   }
 
