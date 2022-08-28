@@ -18,5 +18,10 @@ contract notQuiteRandomCoinFlip is baseResultController, NotQuiteRandom, Ownable
   function generateResult () external onlyOwner {
     setResult(getRandomNumberFromInterval(2));
   }
+
+  function _getGame () internal view override returns (bytes32)
+  {
+    return bytes32(abi.encodePacked("Coin Flip"));
+  }
   
 }

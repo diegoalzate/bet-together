@@ -73,6 +73,8 @@ const PoolDetails = () => {
         const optionDecoded = ethers.utils.parseBytes32String(optionEncoded);
         optionNames.push(optionDecoded);
       }
+      const gameEncoded = await poolContract.getGame();
+      const game = ethers.utils.parseBytes32String(gameEncoded);
       const bets = betEvents.map((event: any) => ({
         sender: event.args.user,
         optionName: optionNames[Number(event.args.option.toString())],
@@ -106,7 +108,7 @@ const PoolDetails = () => {
         amount: totalAmount,
         status: status,
         coin: "USDC",
-        game: "Coin Flip",
+        game: game,
         result: result,
         options: optionNames,
         resultControllerAddress: resultControllerAddress,

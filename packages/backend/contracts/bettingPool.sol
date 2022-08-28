@@ -94,6 +94,10 @@ contract BettingPool is Ownable {
     return resultController.getOptionName(index);
   }
 
+  function getGame () public view returns (bytes32) {
+    return resultController.getGame();
+  }
+
   function withdraw () external {
     // checks 
     require(hasResult(), "Pool not finished.");

@@ -47,4 +47,12 @@ contract baseResultController is IResultController {
   function _getOptionsCount () public view returns (uint256) {
     return optionNames.length;
   }
+
+  function getGame () external view returns (bytes32) {
+    return _getGame();
+  }
+
+  function _getGame () internal view virtual returns (bytes32) {
+    return bytes32(abi.encodePacked("Base Controller"));
+  }
 }

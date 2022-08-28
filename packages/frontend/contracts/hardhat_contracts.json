@@ -5,7 +5,7 @@
       "chainId": "5",
       "contracts": {
         "BettingPool": {
-          "address": "0x96721c632A78d37bb8E395f96e50954e07Ec6883",
+          "address": "0x330824C4474153BA0BC5b5BeDB499A83A83FC692",
           "abi": [
             {
               "inputs": [
@@ -152,6 +152,19 @@
                   "internalType": "uint256",
                   "name": "",
                   "type": "uint256"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "getGame",
+              "outputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "",
+                  "type": "bytes32"
                 }
               ],
               "stateMutability": "view",
@@ -438,7 +451,7 @@
           ]
         },
         "BettingPoolFactory": {
-          "address": "0x7a12EE6df34294b79cF5cb44bBa7063d25653dC0",
+          "address": "0x4c73E73c17455cFd56666A67829609fC6DC34B6f",
           "abi": [
             {
               "anonymous": false,
@@ -1000,7 +1013,7 @@
           ]
         },
         "VRFResultFactory": {
-          "address": "0xCd6659cE83406DAD3b08744694382A138e5d948c",
+          "address": "0x9c0b20f8FDf78284c07028faF2c015c0F700a616",
           "abi": [
             {
               "inputs": [
@@ -1181,8 +1194,74 @@
             }
           ]
         },
+        "aaveFakeWorldCupBettingPoolFactory": {
+          "address": "0xB86A864611F95B2616d7599D67108d070aBf7a37",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "factory",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_aaveAddressProvider",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "inputs": [],
+              "name": "aaveAddressProvider",
+              "outputs": [
+                {
+                  "internalType": "contract IPoolAddressesProvider",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "bettingPoolFactory",
+              "outputs": [
+                {
+                  "internalType": "contract BettingPoolFactory",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                }
+              ],
+              "name": "createPool",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            }
+          ]
+        },
         "aaveVrfCoinflipBettingPoolFactory": {
-          "address": "0xfeDA74d8c705376901767e8c21119b4e62a370f8",
+          "address": "0x017AbC98Cb26d424D7933a7FFCFaaaa397C9ba04",
           "abi": [
             {
               "inputs": [
@@ -1266,7 +1345,7 @@
           ]
         },
         "notQuiteRandomCoinFlip": {
-          "address": "0x8d9055d4142199Fe474A9E2BdB9390B8A839efCc",
+          "address": "0xDb3e0D5755911DeC6EE13df9217ED82F2633C7f5",
           "abi": [
             {
               "inputs": [
@@ -1335,6 +1414,19 @@
               "name": "generateResult",
               "outputs": [],
               "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "getGame",
+              "outputs": [
+                {
+                  "internalType": "bytes32",
+                  "name": "",
+                  "type": "bytes32"
+                }
+              ],
+              "stateMutability": "view",
               "type": "function"
             },
             {
@@ -1489,72 +1581,6 @@
               ],
               "name": "transferOwnership",
               "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            }
-          ]
-        },
-        "aaveFakeWorldCupBettingPoolFactory": {
-          "address": "0xE31efeBA07e26d962f9Ef60800cf382fC0ec38EF",
-          "abi": [
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "factory",
-                  "type": "address"
-                },
-                {
-                  "internalType": "address",
-                  "name": "_aaveAddressProvider",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "constructor"
-            },
-            {
-              "inputs": [],
-              "name": "aaveAddressProvider",
-              "outputs": [
-                {
-                  "internalType": "contract IPoolAddressesProvider",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "bettingPoolFactory",
-              "outputs": [
-                {
-                  "internalType": "contract BettingPoolFactory",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "token",
-                  "type": "address"
-                }
-              ],
-              "name": "createPool",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
               "stateMutability": "nonpayable",
               "type": "function"
             }

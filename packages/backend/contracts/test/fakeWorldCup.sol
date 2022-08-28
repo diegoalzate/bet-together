@@ -46,4 +46,9 @@ contract fakeWorldCup is baseResultController, Ownable {
     setResult(r);
   }
 
+  function _getGame () internal view override returns (bytes32)
+  {
+    return bytes32(abi.encodePacked("World Cup"));
+  }
+
 }

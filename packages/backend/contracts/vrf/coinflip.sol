@@ -36,5 +36,10 @@ contract VRFCoinFlip is baseResultController, Ownable {
     uint256 result = word % _getOptionsCount();
     setResult(result);
   }
+
+  function _getGame () internal view override returns (bytes32)
+  {
+    return bytes32(abi.encodePacked("Coin Flip"));
+  }
   
 }

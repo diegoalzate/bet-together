@@ -150,6 +150,8 @@ const PoolRow = (props: { index: number }) => {
         const openForBets = await poolContract.openForBets();
         const hasResult = await poolContract.hasResult();
         const totalAmount = await poolContract.totalAmount();
+        const gameEncoded = await poolContract.getGame();
+        const game = ethers.utils.parseBytes32String(gameEncoded);
         let status: "open" | "closed" | "yielding";
         if (openForBets) {
           status = "open";
@@ -165,7 +167,7 @@ const PoolRow = (props: { index: number }) => {
           amount: Number(ethers.utils.formatUnits(totalAmount, decimals)),
           status: status,
           coin: "USDC",
-          game: "Coin Flip",
+          game: game,
         });
       }
     } catch (e) {
