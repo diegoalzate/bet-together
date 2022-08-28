@@ -23,6 +23,10 @@ const bettingPoolFactoryAddress =
   allContracts[chainId][0].contracts.BettingPoolFactory.address;
 const bettingPoolFactoryABI =
   allContracts[chainId][0].contracts.BettingPoolFactory.abi;
+const aaveVrfCoinflipbettingPoolFactoryAddress =
+  allContracts[chainId][0].contracts.aaveVrfCoinflipBettingPoolFactory.address;
+const aaveVrfCoinflipbettingPoolFactoryABI =
+  allContracts[chainId][0].contracts.aaveVrfCoinflipBettingPoolFactory.abi;
 const bettingPoolABI = allContracts[chainId][0].contracts.BettingPool.abi;
 // TODO: get decimals from token
 const decimals = 6;
@@ -43,9 +47,9 @@ const Pool = () => {
     functionName: "poolCount",
   });
   const { writeAsync, isLoading: createIsLoading } = useContractWrite({
-    addressOrName: bettingPoolFactoryAddress,
-    contractInterface: bettingPoolFactoryABI,
-    functionName: "createDefaultPool",
+    addressOrName: aaveVrfCoinflipbettingPoolFactoryAddress,
+    contractInterface: aaveVrfCoinflipbettingPoolFactoryABI,
+    functionName: "createPool",
     args: [USDC_TESTNETMINTABLE_GOERLI],
   });
 
