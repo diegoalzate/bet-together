@@ -45,12 +45,12 @@ const config: HardhatUserConfig = {
     //   url: `https://rinkeby.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`,
     //   accounts: [`${process.env.PRIVATE_KEY}`],
     // },
-    // goerli: {
-    //   chainId: 5,
-    //   url: `https://eth-goerli.alchemyapi.io/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`,
-    //   url: `https://goerli.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`,
-    //   accounts: [`${process.env.PRIVATE_KEY}`],
-    // },
+    goerli: {
+      chainId: 5,
+      url: `https://eth-goerli.alchemyapi.io/v2/${process.env.ALCHEMY_GOERLI_API_KEY}`,
+      // url: `https://goerli.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`,
+      accounts: [`${process.env.PRIVATE_KEY}`],
+    },
     // kovan: {
     //   chainId: 42,
     //   url: `https://eth-kovan.alchemyapi.io/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`,
@@ -71,12 +71,13 @@ const config: HardhatUserConfig = {
 
     // L2 TEST NETWORKS
 
-    // mumbai: {
-    //   chainId: 80001,
-    //   url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_ID}`,
-    //   url: `https://polygon-mumbai.infura.io/v3/${process.env.NEXT_PUBLIC_INFURA_ID}`,
-    //   accounts: [`${process.env.PRIVATE_KEY}`],
-    // },
+    mumbai: {
+      chainId: 80001,
+      url: `https://polygon-mumbai.g.alchemy.com/v2/${process.env.ALCHEMY_MUMBAI_API_KEY}`,
+      // url: `https://polygon-mumbai.infura.io/v3/${process.env.ALCHEMY_MUMBAI_API_KEY}`,
+      accounts: [`${process.env.PRIVATE_KEY}`],
+      // saveDeployments: true,
+    },
   },
   namedAccounts: {
     deployer: {

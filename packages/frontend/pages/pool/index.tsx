@@ -1,7 +1,17 @@
 /* eslint-disable react/no-unescaped-entities */
 import Link from "next/link";
-import { useContract, useContractRead, useContractWrite, useSigner } from "wagmi";
-import { FAKE_ADDRESS, NETWORK_ID, USDC_TESTNETMINTABLE_POLYGON } from "@/config";
+import {
+  useContract,
+  useContractRead,
+  useContractWrite,
+  useSigner,
+  useWaitForTransaction,
+} from "wagmi";
+import {
+  FAKE_ADDRESS,
+  NETWORK_ID,
+  USDC_TESTNETMINTABLE_GOERLI,
+} from "@/config";
 import contracts from "@/contracts/hardhat_contracts.json";
 import { useEffect, useState } from "react";
 import { addressShortener } from "@/utils/addressShortener";
@@ -14,25 +24,37 @@ const bettingPoolFactoryAddress =
 const bettingPoolFactoryABI =
   allContracts[chainId][0].contracts.BettingPoolFactory.abi;
 const bettingPoolABI = allContracts[chainId][0].contracts.BettingPool.abi;
-const myTokenAddress = allContracts[chainId][0].contracts.MyToken.address
+// TODO: get decimals from token
+const decimals = 6;
 
 const Pool = () => {
-  const { data: poolCount, isLoading: poolCountIsLoading } = useContractRead({
+  const [poolTransaction, setPoolTransaction] = useState("");
+  const { isLoading: poolTransactionIsLoading, isSuccess } =
+    useWaitForTransaction({
+      hash: poolTransaction ?? FAKE_ADDRESS,
+    });
+  const {
+    data: poolCount,
+    isLoading: poolCountIsLoading,
+    refetch,
+  } = useContractRead({
     addressOrName: bettingPoolFactoryAddress,
     contractInterface: bettingPoolFactoryABI,
     functionName: "poolCount",
   });
-  const {
-    data: createdPool,
-    writeAsync,
-    isSuccess,
-    isLoading: createIsLoading,
-  } = useContractWrite({
+  const { writeAsync, isLoading: createIsLoading } = useContractWrite({
     addressOrName: bettingPoolFactoryAddress,
     contractInterface: bettingPoolFactoryABI,
     functionName: "createDefaultPool",
-    args: [myTokenAddress],
+    args: [USDC_TESTNETMINTABLE_GOERLI],
   });
+
+  useEffect(() => {
+    if (isSuccess) {
+      refetch();
+    }
+  }, [isSuccess]);
+
   return (
     <>
       <div className="flex flex-col space-y-8">
@@ -41,11 +63,18 @@ const Pool = () => {
           <button
             className="btn bg-pBlue text-white"
             onClick={async () => {
-              await writeAsync();
+              try {
+                const tx = await writeAsync();
+                setPoolTransaction(tx.hash);
+              } catch (e) {
+                console.log(e);
+              }
             }}
-            disabled={createIsLoading}
+            disabled={createIsLoading || poolTransactionIsLoading}
           >
-            {createIsLoading ? "creating pool..." : "create pool"}
+            {createIsLoading || poolTransactionIsLoading
+              ? "creating pool..."
+              : "create pool"}
           </button>
         </div>
         <div className="overflow-x-auto">
@@ -78,49 +107,76 @@ const PoolRow = (props: { index: number }) => {
       functionName: "pools",
       args: [props.index],
     });
-    const { data: signerData } = useSigner();
+  const { data: signerData } = useSigner();
   const poolContract = useContract({
     addressOrName: poolAddress?.toString() ?? FAKE_ADDRESS,
     contractInterface: bettingPoolABI,
     signerOrProvider: signerData || undefined,
   });
-  const [pool, setPool] = useState<Pool>()
+  const [isLoading, setIsLoading] = useState(false);
+  const [pool, setPool] = useState<Pool>();
+
   useEffect(() => {
-    if (signerData && poolContract && poolAddress?.toString()) {
-      fetchPool()
+    if (
+      signerData &&
+      !!poolContract.address &&
+      poolContract.address !== FAKE_ADDRESS &&
+      poolAddress?.toString() &&
+      !poolAddressIsLoading
+    ) {
+      fetchPool();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [poolContract])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [poolContract]);
 
   const fetchPool = async () => {
-    const openForBets = await poolContract.openForBets()
-    const hasResult = await poolContract.hasResult()
-    const totalAmount = await poolContract.totalAmount()
-    let status: "open" | "closed" | "yielding";
-    if (openForBets) {
-      status = "open"
-    } else {
-      if (hasResult) {
-        status = "closed"
-      } else {
-        status = "yielding"
+    setIsLoading(true);
+    try {
+      if (await poolContract.deployed()) {
+        const openForBets = await poolContract.openForBets();
+        const hasResult = await poolContract.hasResult();
+        const totalAmount = await poolContract.totalAmount();
+        let status: "open" | "closed" | "yielding";
+        if (openForBets) {
+          status = "open";
+        } else {
+          if (hasResult) {
+            status = "closed";
+          } else {
+            status = "yielding";
+          }
+        }
+        setPool({
+          address: poolAddress?.toString() ?? "",
+          amount: Number(ethers.utils.formatUnits(totalAmount, decimals)),
+          status: status,
+          coin: "USDC",
+          game: "Coin Flip",
+        });
       }
+    } catch (e) {
+      console.log(e)
     }
-    setPool({
-      address: poolAddress?.toString() ?? "",
-      amount: Number(ethers.utils.formatUnits(totalAmount, 18)),
-      status: status,
-      coin: "MTK",
-      game: "Coin Flip", 
-    })
-  }
+    setIsLoading(false);
+  };
   return (
     <Link href={`/pool/${poolAddress}`}>
-      <tr className="hover">
-        <th>{pool?.game}</th>
-        <td>{addressShortener(pool?.address ?? "")}</td>
-        <td>{pool?.status}</td>
-        <td>{`${pool?.amount} ${pool?.coin}`}</td>
+      <tr className={`hover ${isLoading && "animate-pulse"}`}>
+        {isLoading ? (
+          <>
+            <th>loading...</th>
+            <td></td>
+            <td></td>
+            <td></td>
+          </>
+        ) : (
+          <>
+            <th>{pool?.game}</th>
+            <td>{addressShortener(pool?.address ?? "")}</td>
+            <td>{pool?.status}</td>
+            <td>{`${pool?.amount} ${pool?.coin}`}</td>
+          </>
+        )}
       </tr>
     </Link>
   );
