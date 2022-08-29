@@ -23,7 +23,7 @@ Main page: users can create a new pool or select an existing one.
 ![image](.images/poolpage.png)
 
 Pool page: users can place bets. If the user is the pool owner, he can close the pool, and generate the result.
-[screenshot]
+![image](.images/openpool.png)
 
 ### Smart contracts:
 - Core
