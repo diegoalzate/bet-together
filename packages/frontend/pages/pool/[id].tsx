@@ -165,7 +165,7 @@ const PoolDetails = () => {
     <>
       <div className="flex flex-col space-y-8">
         <div className="flex space-x-8 items-baseline">
-          <Link href={`https://mumbai.polygonscan.com/address/${poolAddress}`}>
+          <Link href={`https://goerli.etherscan.io/address/${poolAddress}`}>
             <h2 className="text-5xl font-bold text-white cursor-pointer">
               Pool: #{addressShortener((poolAddress as string) ?? "")}
             </h2>
@@ -305,37 +305,36 @@ const BetModalButton = (props: { pool?: Pool; callback?: () => void }) => {
   };
 
   const sendBet = async () => {
-    const optionIndex = props.pool?.options?.findIndex(
-      (value) => value === form.option
-    );
-    console.log(
-      allowance,
-      props.pool?.address,
-      ethers.constants.MaxUint256.toString()
-    );
-    if (allowance && allowance === "0") {
-      const allowanceTxn = await tokenContract.approve(
-        props.pool?.address,
-        ethers.constants.MaxUint256.toString()
+    try {
+      const optionIndex = props.pool?.options?.findIndex(
+        (value) => value === form.option
       );
-      await allowanceTxn.wait();
-      const betTxn = await poolContract.bet(
-        optionIndex?.toString(),
-        ethers.utils.parseUnits(form.amount.toString(), decimals)
-      );
-      await betTxn.wait();
-      if (props.callback) {
-        await props.callback();
+      if (allowance && allowance === "0") {
+        const allowanceTxn = await tokenContract.approve(
+          props.pool?.address,
+          ethers.constants.MaxUint256.toString()
+        );
+        await allowanceTxn.wait();
+        const betTxn = await poolContract.bet(
+          optionIndex?.toString(),
+          ethers.utils.parseUnits(form.amount.toString(), decimals)
+        );
+        await betTxn.wait();
+        if (props.callback) {
+          await props.callback();
+        }
+      } else {
+        const betTxn = await poolContract.bet(
+          optionIndex?.toString(),
+          ethers.utils.parseUnits(form.amount.toString(), decimals)
+        );
+        await betTxn.wait();
+        if (props.callback) {
+          await props.callback();
+        }
       }
-    } else {
-      const betTxn = await poolContract.bet(
-        optionIndex?.toString(),
-        ethers.utils.parseUnits(form.amount.toString())
-      );
-      await betTxn.wait();
-      if (props.callback) {
-        await props.callback();
-      }
+    } catch (e) {
+      console.log(e)
     }
   };
 
