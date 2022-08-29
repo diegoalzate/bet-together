@@ -39,9 +39,14 @@ Pool page: users can place bets. If the user is the pool owner, he can close the
     - **VRFWorldCup**: world cup simulated vrf pool.
     - **VRFResultFactory**: it is responsible for deploying new coinflip and worldcup controllers and manages the vrf random numbers requests.
   - **Custom Pool factory**
-  - **aaveVrfBettingPoolFactory**: deploys the vrf result controllers and the aave yield source and creates a pool calling the **BettingPoolFactory**
+    - **aaveVrfBettingPoolFactory**: deploys the vrf result controllers and the aave yield source and creates a pool calling the **BettingPoolFactory**
 - **Test**: testing purpose contracts
 
+### Tecnologies used
+
+- [create-web3](https://www.create-web3.xyz/)
+- [Next.js](https://nextjs.org/)
+- [Wagmi.sh](https://wagmi.sh/)
 
 
 # Future work:
