@@ -6,6 +6,7 @@ import "@chainlink/contracts/src/v0.8/interfaces/VRFCoordinatorV2Interface.sol";
 import "@chainlink/contracts/src/v0.8/VRFConsumerBaseV2.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {VRFCoinFlip} from "./coinflip.sol";
+import {VRFWorldCup} from "./worldCup.sol";
 
 contract VRFResultFactory is VRFConsumerBaseV2, Ownable {
   VRFCoordinatorV2Interface COORDINATOR;
@@ -20,7 +21,7 @@ contract VRFResultFactory is VRFConsumerBaseV2, Ownable {
   uint32 numWords = 2;
 
   event randomWordsRequested(address indexed consumer, uint256 indexed requestId);
-  event coinFlipCreated(address indexed owner, address indexed newCoinFlip);
+  event vrfControllerCreated(address indexed owner, address indexed newCoinFlip);
 
   modifier onlyConsumer() {
     require(
@@ -63,8 +64,16 @@ contract VRFResultFactory is VRFConsumerBaseV2, Ownable {
     VRFCoinFlip c = new VRFCoinFlip(owner, address(this));
     address newCoinFlipAddr = address(c);
     consumers[newCoinFlipAddr] = true;
-    emit coinFlipCreated(msg.sender, newCoinFlipAddr);
+    emit vrfControllerCreated(msg.sender, newCoinFlipAddr);
     return newCoinFlipAddr;
+  }
+
+  function createWorldCupController (address owner) public returns(address) {
+    VRFWorldCup c = new VRFWorldCup(owner, address(this));
+    address newCoinController = address(c);
+    consumers[newCoinController] = true;
+    emit vrfControllerCreated(msg.sender, newCoinController);
+    return newCoinController;
   }
 
 }

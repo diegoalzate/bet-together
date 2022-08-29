@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import {IResultController} from "./IResultController.sol";
 
-contract baseResultController is IResultController {
+abstract contract baseResultController is IResultController {
   bool private _hasResult;
   uint256 public result;
   bytes32[] public optionNames;
@@ -52,7 +52,5 @@ contract baseResultController is IResultController {
     return _getGame();
   }
 
-  function _getGame () internal view virtual returns (bytes32) {
-    return bytes32(abi.encodePacked("Base Controller"));
-  }
+  function _getGame () internal view virtual returns (bytes32);
 }

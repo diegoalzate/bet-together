@@ -25,10 +25,10 @@ const bettingPoolFactoryAddress =
 const bettingPoolFactoryABI =
   allContracts[chainId][0].contracts.BettingPoolFactory.abi;
 
-const aaveVrfCoinflipbettingPoolFactoryAddress =
-  allContracts[chainId][0].contracts.aaveVrfCoinflipBettingPoolFactory.address;
-const aaveVrfCoinflipbettingPoolFactoryABI =
-  allContracts[chainId][0].contracts.aaveVrfCoinflipBettingPoolFactory.abi;
+const aaveVrfbettingPoolFactoryAddress =
+  allContracts[chainId][0].contracts.aaveVrfBettingPoolFactory.address;
+const aaveVrfbettingPoolFactoryABI =
+  allContracts[chainId][0].contracts.aaveVrfBettingPoolFactory.abi;
 
 const aaveFakeWorldCupBettingPoolFactoryAddress =
   allContracts[chainId][0].contracts.aaveFakeWorldCupBettingPoolFactory.address;
@@ -55,11 +55,10 @@ const Pool = () => {
     functionName: "poolCount",
   });
   const { writeAsync, isLoading: createIsLoading } = useContractWrite({
-    addressOrName: aaveVrfCoinflipbettingPoolFactoryAddress,
-    contractInterface: aaveVrfCoinflipbettingPoolFactoryABI,
-    // addressOrName: aaveFakeWorldCupBettingPoolFactoryAddress,
-    // contractInterface: aaveFakeWorldCupBettingPoolFactoryABI,
-    functionName: "createPool",
+    addressOrName: aaveVrfbettingPoolFactoryAddress,
+    contractInterface: aaveVrfbettingPoolFactoryABI,
+    // functionName: "createCoinFlipPool",
+    functionName: "createWorldCupPool",
     args: [USDC_TESTNETMINTABLE_GOERLI],
   });
 

@@ -20,7 +20,7 @@ const main: DeployFunction = async function ({getNamedAccounts, deployments, get
   }
 
   const args = [BettingPoolFactory.address, aaveAddressProvider, VRFResultFactory.address];
-  await deploy('aaveVrfCoinflipBettingPoolFactory', {
+  await deploy('aaveVrfBettingPoolFactory', {
     args: args,
     from: deployer,
     log: true,
@@ -29,4 +29,4 @@ const main: DeployFunction = async function ({getNamedAccounts, deployments, get
 
 export default main;
  
-export const tags = ['all', 'BettingPoolFactory', 'VRFResultFactory', 'aaveVrfCoinflipBettingPoolFactory', ]
+export const tags = ['all', 'BettingPoolFactory', 'VRFResultFactory', 'aaveVrfBettingPoolFactory', ]

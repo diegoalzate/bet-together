@@ -451,27 +451,8 @@
           ]
         },
         "BettingPoolFactory": {
-          "address": "0x4c73E73c17455cFd56666A67829609fC6DC34B6f",
+          "address": "0x32aac02eE10b89e47C27Ec0338da042957192e10",
           "abi": [
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "previousOwner",
-                  "type": "address"
-                },
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "newOwner",
-                  "type": "address"
-                }
-              ],
-              "name": "OwnershipTransferred",
-              "type": "event"
-            },
             {
               "anonymous": false,
               "inputs": [
@@ -510,57 +491,6 @@
               "type": "event"
             },
             {
-              "inputs": [],
-              "name": "aaveAddressProvider",
-              "outputs": [
-                {
-                  "internalType": "contract IPoolAddressesProvider",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "token",
-                  "type": "address"
-                }
-              ],
-              "name": "createAaveVRFCoinflipPool",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "token",
-                  "type": "address"
-                }
-              ],
-              "name": "createDefaultPool",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
               "inputs": [
                 {
                   "internalType": "address",
@@ -590,38 +520,6 @@
               "type": "function"
             },
             {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "token",
-                  "type": "address"
-                }
-              ],
-              "name": "createVRFPool",
-              "outputs": [
-                {
-                  "internalType": "uint256",
-                  "name": "",
-                  "type": "uint256"
-                }
-              ],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "owner",
-              "outputs": [
-                {
-                  "internalType": "address",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
               "inputs": [],
               "name": "poolCount",
               "outputs": [
@@ -646,65 +544,6 @@
               "outputs": [
                 {
                   "internalType": "contract BettingPool",
-                  "name": "",
-                  "type": "address"
-                }
-              ],
-              "stateMutability": "view",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "renounceOwnership",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "provider",
-                  "type": "address"
-                }
-              ],
-              "name": "setAaveAddressProvider",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "a",
-                  "type": "address"
-                }
-              ],
-              "name": "setVrfFactory",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [
-                {
-                  "internalType": "address",
-                  "name": "newOwner",
-                  "type": "address"
-                }
-              ],
-              "name": "transferOwnership",
-              "outputs": [],
-              "stateMutability": "nonpayable",
-              "type": "function"
-            },
-            {
-              "inputs": [],
-              "name": "vrfFactory",
-              "outputs": [
-                {
-                  "internalType": "contract VRFResultFactory",
                   "name": "",
                   "type": "address"
                 }
@@ -1013,7 +852,7 @@
           ]
         },
         "VRFResultFactory": {
-          "address": "0x9c0b20f8FDf78284c07028faF2c015c0F700a616",
+          "address": "0x67dA7969990EE921c6EF495a294c4f11cfa24e42",
           "abi": [
             {
               "inputs": [
@@ -1077,25 +916,6 @@
                 {
                   "indexed": true,
                   "internalType": "address",
-                  "name": "owner",
-                  "type": "address"
-                },
-                {
-                  "indexed": true,
-                  "internalType": "address",
-                  "name": "newCoinFlip",
-                  "type": "address"
-                }
-              ],
-              "name": "coinFlipCreated",
-              "type": "event"
-            },
-            {
-              "anonymous": false,
-              "inputs": [
-                {
-                  "indexed": true,
-                  "internalType": "address",
                   "name": "consumer",
                   "type": "address"
                 },
@@ -1110,6 +930,25 @@
               "type": "event"
             },
             {
+              "anonymous": false,
+              "inputs": [
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "owner",
+                  "type": "address"
+                },
+                {
+                  "indexed": true,
+                  "internalType": "address",
+                  "name": "newCoinFlip",
+                  "type": "address"
+                }
+              ],
+              "name": "vrfControllerCreated",
+              "type": "event"
+            },
+            {
               "inputs": [
                 {
                   "internalType": "address",
@@ -1118,6 +957,25 @@
                 }
               ],
               "name": "createCoinFlipController",
+              "outputs": [
+                {
+                  "internalType": "address",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "owner",
+                  "type": "address"
+                }
+              ],
+              "name": "createWorldCupController",
               "outputs": [
                 {
                   "internalType": "address",
@@ -1195,7 +1053,7 @@
           ]
         },
         "aaveFakeWorldCupBettingPoolFactory": {
-          "address": "0xB86A864611F95B2616d7599D67108d070aBf7a37",
+          "address": "0xE8eC065E699685081960aaAA0D7212F0Ce0F354F",
           "abi": [
             {
               "inputs": [
@@ -1256,6 +1114,109 @@
                 }
               ],
               "stateMutability": "nonpayable",
+              "type": "function"
+            }
+          ]
+        },
+        "aaveVrfBettingPoolFactory": {
+          "address": "0xeFE7F20d0485F4D69c58Fc12E87fc3b0c45c636c",
+          "abi": [
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "factory",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_aaveAddressProvider",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "_vrfFactory",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "constructor"
+            },
+            {
+              "inputs": [],
+              "name": "aaveAddressProvider",
+              "outputs": [
+                {
+                  "internalType": "contract IPoolAddressesProvider",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "bettingPoolFactory",
+              "outputs": [
+                {
+                  "internalType": "contract BettingPoolFactory",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                }
+              ],
+              "name": "createCoinFlipPool",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {
+                  "internalType": "address",
+                  "name": "token",
+                  "type": "address"
+                }
+              ],
+              "name": "createWorldCupPool",
+              "outputs": [
+                {
+                  "internalType": "uint256",
+                  "name": "",
+                  "type": "uint256"
+                }
+              ],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [],
+              "name": "vrfFactory",
+              "outputs": [
+                {
+                  "internalType": "contract VRFResultFactory",
+                  "name": "",
+                  "type": "address"
+                }
+              ],
+              "stateMutability": "view",
               "type": "function"
             }
           ]
@@ -1345,7 +1306,7 @@
           ]
         },
         "notQuiteRandomCoinFlip": {
-          "address": "0xDb3e0D5755911DeC6EE13df9217ED82F2633C7f5",
+          "address": "0x5900bB68f6c7667A3dE5DCB30ad3485ef5218791",
           "abi": [
             {
               "inputs": [
