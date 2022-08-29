@@ -97,7 +97,11 @@ const PoolDetails = () => {
       if (hasResult) {
         const optionIndex = await poolContract.getResult();
         userResult = await poolContract.bets(signerAddress, optionIndex);
-        userProfit = await poolContract.getUserProfit(signerAddress);
+        try {
+          userProfit = await poolContract.getUserProfit(signerAddress);
+        } catch (e) {
+          console.log(e)
+        }
         const optionName = await poolContract.getOptionName(optionIndex);
         const resultName = ethers.utils.parseBytes32String(optionName);
         result = resultName;
