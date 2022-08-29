@@ -5,7 +5,7 @@
       "chainId": "5",
       "contracts": {
         "BettingPool": {
-          "address": "0x330824C4474153BA0BC5b5BeDB499A83A83FC692",
+          "address": "0x02554C4fd53cAE6F03d1c6D3FED3C9b6ef0AE912",
           "abi": [
             {
               "inputs": [
@@ -451,7 +451,7 @@
           ]
         },
         "BettingPoolFactory": {
-          "address": "0x32aac02eE10b89e47C27Ec0338da042957192e10",
+          "address": "0xcd218BBE2ab35A9f71df2814806ae5631112f6F8",
           "abi": [
             {
               "anonymous": false,
@@ -852,7 +852,7 @@
           ]
         },
         "VRFResultFactory": {
-          "address": "0x67dA7969990EE921c6EF495a294c4f11cfa24e42",
+          "address": "0x28e6A5CDf12e40155C3351fB3E736EDEf1CF9026",
           "abi": [
             {
               "inputs": [
@@ -1053,7 +1053,7 @@
           ]
         },
         "aaveFakeWorldCupBettingPoolFactory": {
-          "address": "0xE8eC065E699685081960aaAA0D7212F0Ce0F354F",
+          "address": "0x84eF78a7D1A46FE2Edefa610e15542D61Ed66aCC",
           "abi": [
             {
               "inputs": [
@@ -1119,7 +1119,7 @@
           ]
         },
         "aaveVrfBettingPoolFactory": {
-          "address": "0xeFE7F20d0485F4D69c58Fc12E87fc3b0c45c636c",
+          "address": "0x342B3E9C9390cF67c26F52b1dEdd29273e748865",
           "abi": [
             {
               "inputs": [
@@ -1306,7 +1306,7 @@
           ]
         },
         "notQuiteRandomCoinFlip": {
-          "address": "0x5900bB68f6c7667A3dE5DCB30ad3485ef5218791",
+          "address": "0x39944Af0F2aB1Ca4aC5D5E9008414732d18B7e30",
           "abi": [
             {
               "inputs": [
