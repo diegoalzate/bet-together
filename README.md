@@ -10,6 +10,7 @@ For the betting side, our MVP implements a simple coin flip and a simulated worl
 
 - Video: [link](https://www.youtube.com/watch?v=do5MtpuHCZM)
 - Slides: [link](https://docs.google.com/presentation/d/1mNRR-ulZWYaKc9-WqByxrcpb3BvaAlYNmjsQOidGKwg/edit#slide=id.p)
+- Demo: [link](http://bet-together.vercel.app/)
 
 # How it works
 ### Contracts operation:
