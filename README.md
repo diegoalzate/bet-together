@@ -8,7 +8,7 @@ The protocol is inspired by the pooltogether's no-loss-lottery. The main idea is
 
 For the betting side, our MVP implements a simple coin flip and a simulated world cup pool using chainlink's VRF for the random number generation. For the yield part, we built our yield source on top of AAVE V3.
 
-- Video:
+- Video: [link](https://www.youtube.com/watch?v=do5MtpuHCZM)
 - Slides: [link](https://docs.google.com/presentation/d/1mNRR-ulZWYaKc9-WqByxrcpb3BvaAlYNmjsQOidGKwg/edit#slide=id.p)
 
 # How it works
