@@ -13,7 +13,7 @@ abstract contract baseResultController is IResultController {
   }
 
   function setResult (uint256 r) internal {
-    require(!_hasResult, "Already has result");
+    require(!_hasResult, "Already has result.");
     _hasResult = true;
     result = r;
     emit resultGenerated (address(this), result);
