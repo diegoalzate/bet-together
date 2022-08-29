@@ -182,19 +182,24 @@ describe("BettingPool", function () {
     vrfResultFactoryContract = await vrfResultFactoryFactory.deploy(hardhatVrfCoordinatorV2Mock.address, 1, keyHash);
     let tx = await hardhatVrfCoordinatorV2Mock.addConsumer(1, vrfResultFactoryContract.address);
     await tx.wait();
-    tx = await poolFactoryContract.setVrfFactory(vrfResultFactoryContract.address);
-    await tx.wait();
+    // tx = await poolFactoryContract.setVrfFactory(vrfResultFactoryContract.address);
+    // await tx.wait();
   }
   
   const createVRFPool = async () => {
-    const tx = await poolFactoryContract.createVRFPool(tokenContract.address);
+    const accounts = await ethers.getSigners();
+    const createTx = await vrfResultFactoryContract.createCoinFlipController(accounts[0].address);
+    let { events } = await createTx.wait();
+    // console.log(events);
+    let [owner, vrfResultControllerAddress] = events.filter( (x: any) => x.event === 'vrfControllerCreated')[0].args;
+    // console.log("address", vrfResultControllerAddress);
+    const VRFCoinFlipFactory = await ethers.getContractFactory("VRFCoinFlip");
+    vrfCoinFlipContract = VRFCoinFlipFactory.attach(vrfResultControllerAddress);
+    yieldContract.address
+    let tx = await poolFactoryContract.createPool(tokenContract.address,
+                                                  vrfResultControllerAddress,
+                                                  yieldContract.address);
     await tx.wait();
-    // get pool contract
-    const poolCount = await poolFactoryContract.poolCount(); 
-    const pollContract = await getPoolContract(poolCount - 1);
-    const coinFlipFactory = await ethers.getContractFactory("VRFCoinFlip");
-    const coinFlipAddress = await pollContract.resultController();
-    vrfCoinFlipContract = coinFlipFactory.attach(coinFlipAddress);
     totalPoolCount++;
   }
 
@@ -334,7 +339,7 @@ describe("VRFMock", function () {
     const createTx = await vrfResultFactoryContract.createCoinFlipController(accounts[0].address);
     let { events } = await createTx.wait();
     // console.log(events);
-    let [owner, vrfResultControllerAddress] = events.filter( (x: any) => x.event === 'coinFlipCreated')[0].args;
+    let [owner, vrfResultControllerAddress] = events.filter( (x: any) => x.event === 'vrfControllerCreated')[0].args;
     // console.log("address", vrfResultControllerAddress);
     const VRFCoinFlipFactory = await ethers.getContractFactory("VRFCoinFlip");
     const VRFCoinFlip = VRFCoinFlipFactory.attach(vrfResultControllerAddress);

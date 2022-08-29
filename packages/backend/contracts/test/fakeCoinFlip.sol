@@ -14,4 +14,9 @@ contract fakeCoinFlip is baseResultController {
     setResult(r);
   }
 
+  function _getGame () internal view override returns (bytes32)
+  {
+    return bytes32(abi.encodePacked("Coin Flip"));
+  }
+
 }

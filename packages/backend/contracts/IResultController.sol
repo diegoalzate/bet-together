@@ -7,4 +7,5 @@ interface IResultController {
   function getResult () external view returns (uint256);
   function getOptionsCount () external view returns (uint256);
   function getOptionName (uint256 index) external view returns (bytes32);
+  function getGame () external view returns (bytes32);
 }

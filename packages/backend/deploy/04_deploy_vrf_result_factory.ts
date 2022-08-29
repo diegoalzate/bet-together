@@ -30,19 +30,19 @@ const main: DeployFunction = async function ({getNamedAccounts, deployments, get
     log: true,
   });
 
-  const {owner} = await getNamedAccounts();
-  const VRFResultFactory = await deployments.get('VRFResultFactory');
-  const BettingPoolFactory = await ethers.getContract('BettingPoolFactory', owner);
-  const currentVrfFactory = await BettingPoolFactory.vrfFactory();
-  console.log("current Address Provider ", currentVrfFactory);
-  if (currentVrfFactory === VRFResultFactory.address) {
-    console.log("vrf factory up to date.")
-    return;
-  }
+  // const {owner} = await getNamedAccounts();
+  // const VRFResultFactory = await deployments.get('VRFResultFactory');
+  // const BettingPoolFactory = await ethers.getContract('BettingPoolFactory', owner);
+  // const currentVrfFactory = await BettingPoolFactory.vrfFactory();
+  // console.log("current Address Provider ", currentVrfFactory);
+  // if (currentVrfFactory === VRFResultFactory.address) {
+  //   console.log("vrf factory up to date.")
+  //   return;
+  // }
   
-  const tx = await BettingPoolFactory.setVrfFactory(VRFResultFactory.address);
-  console.log("Updating vrffactory on the betting pool factory, tx.hash =", tx.hash);
-  const txReceipt = await tx.wait();
+  // const tx = await BettingPoolFactory.setVrfFactory(VRFResultFactory.address);
+  // console.log("Updating vrffactory on the betting pool factory, tx.hash =", tx.hash);
+  // const txReceipt = await tx.wait();
 };
 
 export default main;

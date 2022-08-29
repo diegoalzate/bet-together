@@ -19,10 +19,22 @@ import { Pool } from "@/types";
 import { ethers } from "ethers";
 const chainId = Number(NETWORK_ID);
 const allContracts = contracts as any;
+
 const bettingPoolFactoryAddress =
   allContracts[chainId][0].contracts.BettingPoolFactory.address;
 const bettingPoolFactoryABI =
   allContracts[chainId][0].contracts.BettingPoolFactory.abi;
+
+const aaveVrfbettingPoolFactoryAddress =
+  allContracts[chainId][0].contracts.aaveVrfBettingPoolFactory.address;
+const aaveVrfbettingPoolFactoryABI =
+  allContracts[chainId][0].contracts.aaveVrfBettingPoolFactory.abi;
+
+const aaveFakeWorldCupBettingPoolFactoryAddress =
+  allContracts[chainId][0].contracts.aaveFakeWorldCupBettingPoolFactory.address;
+const aaveFakeWorldCupBettingPoolFactoryABI =
+  allContracts[chainId][0].contracts.aaveFakeWorldCupBettingPoolFactory.abi;
+
 const bettingPoolABI = allContracts[chainId][0].contracts.BettingPool.abi;
 // TODO: get decimals from token
 const decimals = 6;
@@ -43,9 +55,10 @@ const Pool = () => {
     functionName: "poolCount",
   });
   const { writeAsync, isLoading: createIsLoading } = useContractWrite({
-    addressOrName: bettingPoolFactoryAddress,
-    contractInterface: bettingPoolFactoryABI,
-    functionName: "createDefaultPool",
+    addressOrName: aaveVrfbettingPoolFactoryAddress,
+    contractInterface: aaveVrfbettingPoolFactoryABI,
+    // functionName: "createCoinFlipPool",
+    functionName: "createWorldCupPool",
     args: [USDC_TESTNETMINTABLE_GOERLI],
   });
 
@@ -136,6 +149,8 @@ const PoolRow = (props: { index: number }) => {
         const openForBets = await poolContract.openForBets();
         const hasResult = await poolContract.hasResult();
         const totalAmount = await poolContract.totalAmount();
+        const gameEncoded = await poolContract.getGame();
+        const game = ethers.utils.parseBytes32String(gameEncoded);
         let status: "open" | "closed" | "yielding";
         if (openForBets) {
           status = "open";
@@ -151,7 +166,7 @@ const PoolRow = (props: { index: number }) => {
           amount: Number(ethers.utils.formatUnits(totalAmount, decimals)),
           status: status,
           coin: "USDC",
-          game: "Coin Flip",
+          game: game,
         });
       }
     } catch (e) {

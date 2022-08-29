@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import {IResultController} from "./IResultController.sol";
 
-contract baseResultController is IResultController {
+abstract contract baseResultController is IResultController {
   bool private _hasResult;
   uint256 public result;
   bytes32[] public optionNames;
@@ -47,4 +47,10 @@ contract baseResultController is IResultController {
   function _getOptionsCount () public view returns (uint256) {
     return optionNames.length;
   }
+
+  function getGame () external view returns (bytes32) {
+    return _getGame();
+  }
+
+  function _getGame () internal view virtual returns (bytes32);
 }
