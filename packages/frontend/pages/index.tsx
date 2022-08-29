@@ -87,11 +87,7 @@ const Team = () => {
       name: "Bernardo Bianchi Franceschin",
       socialName: "@bfranceschin#1346",
       message: "Just vibin",
-    },
-    {
-      name: "Epi",
-      message: "Just vibin",
-    },
+    }
   ];
   return (
     <div className="flex flex-col items-center text-white space-y-4">

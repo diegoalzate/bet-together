@@ -39,12 +39,18 @@ const bettingPoolABI = allContracts[chainId][0].contracts.BettingPool.abi;
 // TODO: get decimals from token
 const decimals = 6;
 
+const BETTING_GAMES = {
+  COIN_FLIP: "createCoinFlipPool",
+  WORLD_CUP: "createWorldCupPool",
+};
+
 const Pool = () => {
   const [poolTransaction, setPoolTransaction] = useState("");
   const { isLoading: poolTransactionIsLoading, isSuccess } =
     useWaitForTransaction({
       hash: poolTransaction ?? FAKE_ADDRESS,
     });
+  const { data: signerData } = useSigner();
   const {
     data: poolCount,
     isLoading: poolCountIsLoading,
@@ -54,12 +60,10 @@ const Pool = () => {
     contractInterface: bettingPoolFactoryABI,
     functionName: "poolCount",
   });
-  const { writeAsync, isLoading: createIsLoading } = useContractWrite({
+  const bettingPoolContract = useContract({
     addressOrName: aaveVrfbettingPoolFactoryAddress,
     contractInterface: aaveVrfbettingPoolFactoryABI,
-    // functionName: "createCoinFlipPool",
-    functionName: "createWorldCupPool",
-    args: [USDC_TESTNETMINTABLE_GOERLI],
+    signerOrProvider: signerData || undefined,
   });
 
   useEffect(() => {
@@ -73,22 +77,50 @@ const Pool = () => {
       <div className="flex flex-col space-y-8">
         <div className="flex justify-between">
           <h2 className="text-5xl font-bold text-white">Betting pools</h2>
-          <button
-            className="btn bg-pBlue text-white"
-            onClick={async () => {
-              try {
-                const tx = await writeAsync();
-                setPoolTransaction(tx.hash);
-              } catch (e) {
-                console.log(e);
-              }
-            }}
-            disabled={createIsLoading || poolTransactionIsLoading}
-          >
-            {createIsLoading || poolTransactionIsLoading
-              ? "creating pool..."
-              : "create pool"}
-          </button>
+          <div className="dropdown dropdown-end">
+            <label tabIndex={0} className="btn bg-pBlue text-white m-1">
+              {poolTransactionIsLoading ? "creating pool..." : "create pool"}
+            </label>
+            <ul
+              tabIndex={0}
+              className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+            >
+              <li>
+                <button
+                  onClick={async () => {
+                    try {
+                      const tx = await bettingPoolContract?.[
+                        BETTING_GAMES.COIN_FLIP
+                      ](USDC_TESTNETMINTABLE_GOERLI);
+                      setPoolTransaction(tx.hash);
+                    } catch (e) {
+                      console.log(e);
+                    }
+                  }}
+                  disabled={poolTransactionIsLoading}
+                >
+                  Coin Flip
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={async () => {
+                    try {
+                      const tx = await bettingPoolContract?.[
+                        BETTING_GAMES.WORLD_CUP
+                      ](USDC_TESTNETMINTABLE_GOERLI);
+                      setPoolTransaction(tx.hash);
+                    } catch (e) {
+                      console.log(e);
+                    }
+                  }}
+                  disabled={poolTransactionIsLoading}
+                >
+                  World Cup
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="table w-full">
@@ -170,7 +202,7 @@ const PoolRow = (props: { index: number }) => {
         });
       }
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
     setIsLoading(false);
   };
