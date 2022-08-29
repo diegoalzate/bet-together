@@ -20,8 +20,7 @@ For the betting side, our MVP implements a simple coin flip and a simulated worl
 
 ### Frontend:
 Main page: users can create a new pool or select an existing one.
-![image](./images/poolpage.png)
-<img src='./images/poolpage.png' width=400/>
+![image](.images/poolpage.png)
 
 Pool page: users can place bets. If the user is the pool owner, he can close the pool, and generate the result.
 [screenshot]
