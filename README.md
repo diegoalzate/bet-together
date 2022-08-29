@@ -8,8 +8,8 @@ The protocol is inspired by the pooltogether's no-loss-lottery. The main idea is
 
 For the betting side, our MVP implements a simple coin flip and a simulated world cup pool using chainlink's VRF for the random number generation. For the yield part, we built our yield source on top of AAVE V3.
 
-Video:
-Slides:
+- Video: [link](https://www.youtube.com/watch?v=do5MtpuHCZM)
+- Slides: [link](https://docs.google.com/presentation/d/1mNRR-ulZWYaKc9-WqByxrcpb3BvaAlYNmjsQOidGKwg/edit#slide=id.p)
 
 # How it works
 ### Contracts operation:
@@ -20,7 +20,7 @@ Slides:
 
 ### Frontend:
 Main page: users can create a new pool or select an existing one.
-[screenshot]
+![image](.images/poolpage.png)
 
 Pool page: users can place bets. If the user is the pool owner, he can close the pool, and generate the result.
 [screenshot]
@@ -39,9 +39,14 @@ Pool page: users can place bets. If the user is the pool owner, he can close the
     - **VRFWorldCup**: world cup simulated vrf pool.
     - **VRFResultFactory**: it is responsible for deploying new coinflip and worldcup controllers and manages the vrf random numbers requests.
   - **Custom Pool factory**
-  - **aaveVrfBettingPoolFactory**: deploys the vrf result controllers and the aave yield source and creates a pool calling the **BettingPoolFactory**
+    - **aaveVrfBettingPoolFactory**: deploys the vrf result controllers and the aave yield source and creates a pool calling the **BettingPoolFactory**
 - **Test**: testing purpose contracts
 
+### Tecnologies used
+
+- [create-web3](https://www.create-web3.xyz/)
+- [Next.js](https://nextjs.org/)
+- [Wagmi.sh](https://wagmi.sh/)
 
 
 # Future work:
